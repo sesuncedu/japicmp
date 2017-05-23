@@ -6,8 +6,8 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.*;
 import japicmp.util.ClassHelper;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import javassist.NotFoundException;
 
 import java.util.*;
@@ -191,28 +191,28 @@ public class CompatibilityChanges {
 
 	private JApiClass loadClass(String newSuperclassName) {
 		JApiClass foundClass;
-		Optional<CtClass> oldClassOptional = Optional.absent();
-		Optional<CtClass> newClassOptional = Optional.absent();
+		Optional<ClassApiSignature> oldClassOptional = Optional.absent();
+		Optional<ClassApiSignature> newClassOptional = Optional.absent();
 		JarArchiveComparatorOptions.ClassPathMode classPathMode = this.jarArchiveComparator.getJarArchiveComparatorOptions().getClassPathMode();
 		if (classPathMode == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
-			ClassPool classPool = this.jarArchiveComparator.getCommonClassPool();
+			ClassApiSignatureSource classApiSignatureSource = this.jarArchiveComparator.getCommonClassPool();
 			try {
-				oldClassOptional = Optional.of(classPool.get(newSuperclassName));
+				oldClassOptional = Optional.of(classApiSignatureSource.get(newSuperclassName));
 			} catch (NotFoundException e) {
 				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
 			}
 			try {
-				newClassOptional = Optional.of(classPool.get(newSuperclassName));
+				newClassOptional = Optional.of(classApiSignatureSource.get(newSuperclassName));
 			} catch (NotFoundException e) {
 				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
 			}
 		} else {
-			ClassPool oldClassPool = this.jarArchiveComparator.getOldClassPool();
-			ClassPool newClassPool = this.jarArchiveComparator.getNewClassPool();
+			ClassApiSignatureSource oldClassPool = this.jarArchiveComparator.getOldClassPool();
+			ClassApiSignatureSource newClassPool = this.jarArchiveComparator.getNewClassPool();
 			try {
 				oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
 			} catch (NotFoundException e) {

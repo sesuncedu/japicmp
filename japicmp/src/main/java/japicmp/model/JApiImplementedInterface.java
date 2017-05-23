@@ -1,7 +1,7 @@
 package japicmp.model;
 
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 import com.google.common.base.Optional;
-import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompatibility {
-	private final CtClass ctClass;
+	private final ClassApiSignature classApiSignature;
 	private final String fullyQualifiedName;
 	private final JApiChangeStatus changeStatus;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new ArrayList<>();
 	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
 
-	public JApiImplementedInterface(CtClass ctClass, String fullyQualifiedName, JApiChangeStatus changeStatus) {
-		this.ctClass = ctClass;
+	public JApiImplementedInterface(ClassApiSignature classApiSignature, String fullyQualifiedName, JApiChangeStatus changeStatus) {
+		this.classApiSignature = classApiSignature;
 		this.fullyQualifiedName = fullyQualifiedName;
 		this.changeStatus = changeStatus;
 	}
@@ -78,7 +78,7 @@ public class JApiImplementedInterface implements JApiHasChangeStatus, JApiCompat
 	}
 
 	@XmlTransient
-	public CtClass getCtClass() {
-		return ctClass;
+	public ClassApiSignature getCtClass() {
+		return classApiSignature;
 	}
 }

@@ -5,8 +5,8 @@ import com.google.common.collect.ImmutableList;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
 import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.Assertion;
@@ -157,14 +157,14 @@ public class JApiCmpTest {
 				assertThat(errLogTrimmed, containsString("E: Could not load 'NotExistingSuperclass'".trim()));
 			}
 		});
-		ClassPool cp = new ClassPool(true);
-		CtClass ctClassSuperclass = CtClassBuilder.create().name("NotExistingSuperclass").addToClassPool(cp);
+		ClassApiSignatureSource cp = new ClassApiSignatureSource(true);
+		ClassApiSignature ctClassSuperclass = CtClassBuilder.create().name("NotExistingSuperclass").addToClassPool(cp);
 		CtConstructorBuilder.create().addToClass(ctClassSuperclass);
-		CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperclass).addToClassPool(cp);
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperclass).addToClassPool(cp);
 		Path oldPath = Paths.get(System.getProperty("user.dir"), "target", JApiCmpTest.class.getSimpleName() + "_old.jar");
-		createJarFile(oldPath, ctClass);
+		createJarFile(oldPath, classApiSignature);
 		Path newPath = Paths.get(System.getProperty("user.dir"), "target", JApiCmpTest.class.getSimpleName() + "_new.jar");
-		createJarFile(newPath, ctClass);
+		createJarFile(newPath, classApiSignature);
 		JApiCmp.main(new String[]{"-n", newPath.toString(), "-o", oldPath.toString()});
 	}
 
@@ -177,14 +177,14 @@ public class JApiCmpTest {
 				assertThat(outLog, containsString("WARNING: You have ignored certain classes".trim()));
 			}
 		});
-		ClassPool cp = new ClassPool(true);
-		CtClass ctClassSuperclass = CtClassBuilder.create().name("NotExistingSuperclass").addToClassPool(cp);
+		ClassApiSignatureSource cp = new ClassApiSignatureSource(true);
+		ClassApiSignature ctClassSuperclass = CtClassBuilder.create().name("NotExistingSuperclass").addToClassPool(cp);
 		CtConstructorBuilder.create().addToClass(ctClassSuperclass);
-		CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperclass).addToClassPool(cp);
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperclass).addToClassPool(cp);
 		Path oldPath = Paths.get(System.getProperty("user.dir"), "target", JApiCmpTest.class.getSimpleName() + "_old.jar");
-		createJarFile(oldPath, ctClass);
+		createJarFile(oldPath, classApiSignature);
 		Path newPath = Paths.get(System.getProperty("user.dir"), "target", JApiCmpTest.class.getSimpleName() + "_new.jar");
-		createJarFile(newPath, ctClass);
+		createJarFile(newPath, classApiSignature);
 		JApiCmp.main(new String[]{"-n", newPath.toString(), "-o", oldPath.toString(), IGNORE_MISSING_CLASSES_BY_REGEX, ".*Superc.*"});
 	}
 }

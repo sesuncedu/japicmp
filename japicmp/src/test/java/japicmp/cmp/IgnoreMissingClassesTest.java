@@ -6,8 +6,8 @@ import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
 import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import javassist.NotFoundException;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class IgnoreMissingClassesTest {
 
 	@Test
 	public void testNotFoundExceptionContainsClassName() {
-		ClassPool cp = new ClassPool(true);
+		ClassApiSignatureSource cp = new ClassApiSignatureSource(true);
 		String className = "not.existing.class";
 		try {
 			cp.get(className);
@@ -50,14 +50,14 @@ public class IgnoreMissingClassesTest {
 	public void testClassMissingWithoutIgnore() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-		ClassPool classPool = jarArchiveComparator.getCommonClassPool();
-		CtClass ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classPool);
+		ClassApiSignatureSource classApiSignatureSource = jarArchiveComparator.getCommonClassPool();
+		ClassApiSignature ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classApiSignatureSource);
 		CtConstructorBuilder.create().publicAccess().addToClass(ctSuperclass);
-		CtClass ctClass = CtClassBuilder.create().withSuperclass(ctSuperclass).name("Test").addToClassPool(classPool);
+		ClassApiSignature classApiSignature = CtClassBuilder.create().withSuperclass(ctSuperclass).name("Test").addToClassPool(classApiSignatureSource);
 		Path oldPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_old.jar");
-		createJarFile(oldPath, ctClass);
+		createJarFile(oldPath, classApiSignature);
 		Path newPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_new.jar");
-		createJarFile(newPath, ctClass);
+		createJarFile(newPath, classApiSignature);
 		jarArchiveComparator = new JarArchiveComparator(options);
 		try {
 			jarArchiveComparator.compare(toJApiCmpArchive(oldPath.toFile()), toJApiCmpArchive(newPath.toFile()));
@@ -73,14 +73,14 @@ public class IgnoreMissingClassesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.getIgnoreMissingClasses().setIgnoreAllMissingClasses(true);
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-		ClassPool classPool = jarArchiveComparator.getCommonClassPool();
-		CtClass ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classPool);
+		ClassApiSignatureSource classApiSignatureSource = jarArchiveComparator.getCommonClassPool();
+		ClassApiSignature ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classApiSignatureSource);
 		CtConstructorBuilder.create().publicAccess().addToClass(ctSuperclass);
-		CtClass ctClass = CtClassBuilder.create().withSuperclass(ctSuperclass).name("Test").addToClassPool(classPool);
+		ClassApiSignature classApiSignature = CtClassBuilder.create().withSuperclass(ctSuperclass).name("Test").addToClassPool(classApiSignatureSource);
 		Path oldPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_old.jar");
-		createJarFile(oldPath, ctClass);
+		createJarFile(oldPath, classApiSignature);
 		Path newPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_new.jar");
-		createJarFile(newPath, ctClass);
+		createJarFile(newPath, classApiSignature);
 		jarArchiveComparator = new JarArchiveComparator(options);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(toJApiCmpArchive(oldPath.toFile()), toJApiCmpArchive(newPath.toFile()));
 		assertThat(jApiClasses.size(), is(1));
@@ -91,14 +91,14 @@ public class IgnoreMissingClassesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.getIgnoreMissingClasses().setIgnoreMissingClassRegularExpression(Arrays.asList(Pattern.compile(".*NotExisting")));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-		ClassPool classPool = jarArchiveComparator.getCommonClassPool();
-		CtClass ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classPool);
+		ClassApiSignatureSource classApiSignatureSource = jarArchiveComparator.getCommonClassPool();
+		ClassApiSignature ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classApiSignatureSource);
 		CtConstructorBuilder.create().publicAccess().addToClass(ctSuperclass);
-		CtClass ctClass = CtClassBuilder.create().withSuperclass(ctSuperclass).name("Test").addToClassPool(classPool);
+		ClassApiSignature classApiSignature = CtClassBuilder.create().withSuperclass(ctSuperclass).name("Test").addToClassPool(classApiSignatureSource);
 		Path oldPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_old.jar");
-		createJarFile(oldPath, ctClass);
+		createJarFile(oldPath, classApiSignature);
 		Path newPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_new.jar");
-		createJarFile(newPath, ctClass);
+		createJarFile(newPath, classApiSignature);
 		jarArchiveComparator = new JarArchiveComparator(options);
 		List<JApiClass> jApiClasses = jarArchiveComparator.compare(toJApiCmpArchive(oldPath.toFile()), toJApiCmpArchive(newPath.toFile()));
 		assertThat(jApiClasses.size(), is(1));
@@ -109,14 +109,14 @@ public class IgnoreMissingClassesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.getIgnoreMissingClasses().setIgnoreMissingClassRegularExpression(Collections.singletonList(Pattern.compile("WrongPattern")));
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-		ClassPool classPool = jarArchiveComparator.getCommonClassPool();
-		CtClass ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classPool);
+		ClassApiSignatureSource classApiSignatureSource = jarArchiveComparator.getCommonClassPool();
+		ClassApiSignature ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classApiSignatureSource);
 		CtConstructorBuilder.create().publicAccess().addToClass(ctSuperclass);
-		CtClass ctClass = CtClassBuilder.create().withSuperclass(ctSuperclass).name("Test").addToClassPool(classPool);
+		ClassApiSignature classApiSignature = CtClassBuilder.create().withSuperclass(ctSuperclass).name("Test").addToClassPool(classApiSignatureSource);
 		Path oldPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_old.jar");
-		createJarFile(oldPath, ctClass);
+		createJarFile(oldPath, classApiSignature);
 		Path newPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_new.jar");
-		createJarFile(newPath, ctClass);
+		createJarFile(newPath, classApiSignature);
 		jarArchiveComparator = new JarArchiveComparator(options);
 		try {
 			jarArchiveComparator.compare(toJApiCmpArchive(oldPath.toFile()), toJApiCmpArchive(newPath.toFile()));

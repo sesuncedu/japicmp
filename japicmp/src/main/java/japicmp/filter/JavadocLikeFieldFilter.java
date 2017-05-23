@@ -1,8 +1,8 @@
 package japicmp.filter;
 
 import japicmp.exception.JApiCmpException;
-import javassist.CtClass;
-import javassist.CtField;
+
+import javassist.ApiField;
 
 import java.util.regex.Pattern;
 
@@ -25,13 +25,13 @@ public class JavadocLikeFieldFilter implements FieldFilter {
 	}
 
 	@Override
-	public boolean matches(CtField ctField) {
-		CtClass declaringClass = ctField.getDeclaringClass();
+	public boolean matches(ApiField ApiField) {
+		ClassApiSignature declaringClass = ApiField.getDeclaringClass();
 		String className = declaringClass.getName();
 		if (!this.patternClass.matcher(className).matches()) {
 			return false;
 		}
-		String fieldName = ctField.getName();
+		String fieldName = ApiField.getName();
 		return this.patternField.matcher(fieldName).matches();
 	}
 

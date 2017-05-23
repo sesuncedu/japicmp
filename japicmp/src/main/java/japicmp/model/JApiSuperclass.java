@@ -1,10 +1,10 @@
 package japicmp.model;
 
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.util.ClassHelper;
 import japicmp.util.OptionalHelper;
-import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -15,14 +15,14 @@ import java.util.List;
 
 public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 	private final JApiClass jApiClass;
-	private final Optional<CtClass> oldSuperclassOptional;
-	private final Optional<CtClass> newSuperclassOptional;
+	private final Optional<ClassApiSignature> oldSuperclassOptional;
+	private final Optional<ClassApiSignature> newSuperclassOptional;
 	private final JApiChangeStatus changeStatus;
 	private final JarArchiveComparator jarArchiveComparator;
 	private final List<JApiCompatibilityChange> compatibilityChanges = new LinkedList<>();
 	private Optional<JApiClass> correspondingJApiClass = Optional.absent();
 
-	public JApiSuperclass(JApiClass jApiClass, Optional<CtClass> oldSuperclassOptional, Optional<CtClass> newSuperclassOptional, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
+	public JApiSuperclass(JApiClass jApiClass, Optional<ClassApiSignature> oldSuperclassOptional, Optional<ClassApiSignature> newSuperclassOptional, JApiChangeStatus changeStatus, JarArchiveComparator jarArchiveComparator) {
 		this.jApiClass = jApiClass;
 		this.oldSuperclassOptional = oldSuperclassOptional;
 		this.newSuperclassOptional = newSuperclassOptional;
@@ -38,8 +38,8 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 	 */
 	public Optional<JApiClass> getJApiClass() {
 		if (oldSuperclassOptional.isPresent() && newSuperclassOptional.isPresent()) {
-			CtClass oldSuperclass = oldSuperclassOptional.get();
-			CtClass newSuperclass = newSuperclassOptional.get();
+			ClassApiSignature oldSuperclass = oldSuperclassOptional.get();
+			ClassApiSignature newSuperclass = newSuperclassOptional.get();
 			String oldSuperclassName = oldSuperclass.getName();
 			String newSuperclassName = newSuperclass.getName();
 			if (oldSuperclassName.equals(newSuperclassName)) {
@@ -50,28 +50,28 @@ public class JApiSuperclass implements JApiHasChangeStatus, JApiCompatibility {
 				return Optional.absent();
 			}
 		} else if (oldSuperclassOptional.isPresent()) {
-			CtClass oldSuperclass = oldSuperclassOptional.get();
+			ClassApiSignature oldSuperclass = oldSuperclassOptional.get();
 			String oldSuperclassName = oldSuperclass.getName();
 			JApiClassType classType = new JApiClassType(Optional.of(ClassHelper.getType(oldSuperclass)), Optional.<JApiClassType.ClassType>absent(), JApiChangeStatus.REMOVED);
-			JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, classType);
+			JApiClass jApiClass = new JApiClass(jarArchiveComparator, oldSuperclassName, Optional.of(oldSuperclass), Optional.<ClassApiSignature>absent(), JApiChangeStatus.REMOVED, classType);
 			return Optional.of(jApiClass);
 		} else if (newSuperclassOptional.isPresent()) {
-			CtClass newSuperclass = newSuperclassOptional.get();
+			ClassApiSignature newSuperclass = newSuperclassOptional.get();
 			String newSuperclassName = newSuperclass.getName();
 			JApiClassType classType = new JApiClassType(Optional.<JApiClassType.ClassType>absent(), Optional.of(ClassHelper.getType(newSuperclass)), JApiChangeStatus.NEW);
-			JApiClass jApiClass = new JApiClass(jarArchiveComparator, newSuperclassName, Optional.<CtClass>absent(), Optional.of(newSuperclass), JApiChangeStatus.NEW, classType);
+			JApiClass jApiClass = new JApiClass(jarArchiveComparator, newSuperclassName, Optional.<ClassApiSignature>absent(), Optional.of(newSuperclass), JApiChangeStatus.NEW, classType);
 			return Optional.of(jApiClass);
 		}
 		return Optional.absent();
 	}
 
 	@XmlTransient
-	public Optional<CtClass> getOldSuperclass() {
+	public Optional<ClassApiSignature> getOldSuperclass() {
 		return oldSuperclassOptional;
 	}
 
 	@XmlTransient
-	public Optional<CtClass> getNewSuperclass() {
+	public Optional<ClassApiSignature> getNewSuperclass() {
 		return newSuperclassOptional;
 	}
 

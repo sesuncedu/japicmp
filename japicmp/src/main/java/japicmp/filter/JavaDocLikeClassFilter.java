@@ -1,6 +1,6 @@
 package japicmp.filter;
 
-import javassist.CtClass;
+
 
 import java.util.regex.Pattern;
 
@@ -27,8 +27,8 @@ public class JavaDocLikeClassFilter implements ClassFilter {
 	}
 
 	@Override
-	public boolean matches(CtClass ctClass) {
-		String name = ctClass.getName();
+	public boolean matches(ClassApiSignature classApiSignature) {
+		String name = classApiSignature.getName();
 		return pattern.matcher(name).matches();
 	}
 }

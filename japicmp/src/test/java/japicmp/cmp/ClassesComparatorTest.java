@@ -5,8 +5,8 @@ import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
 import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import javassist.NotFoundException;
 import org.junit.Test;
 
@@ -21,13 +21,13 @@ public class ClassesComparatorTest {
 	public void testMethodAdded() throws Exception {
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(new JarArchiveComparatorOptions(), new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				return Collections.singletonList(createClassWithoutMethod(classPool));
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				return Collections.singletonList(createClassWithoutMethod(classApiSignatureSource));
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				return Collections.singletonList(createClassWithMethod(classPool));
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				return Collections.singletonList(createClassWithMethod(classApiSignatureSource));
 			}
 		});
 		assertThat(jApiClasses.size(), is(1));
@@ -38,13 +38,13 @@ public class ClassesComparatorTest {
 		assertThat(jApiClasses.get(0).getChangeStatus(), is(JApiChangeStatus.MODIFIED));
 	}
 
-	private CtClass createClassWithoutMethod(ClassPool classPool) {
-		return new CtClassBuilder().name("japicmp.Test").addToClassPool(classPool);
+	private ClassApiSignature createClassWithoutMethod(ClassApiSignatureSource classApiSignatureSource) {
+		return new CtClassBuilder().name("japicmp.Test").addToClassPool(classApiSignatureSource);
 	}
 
-	private CtClass createClassWithMethod(ClassPool classPool) throws NotFoundException, CannotCompileException {
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-		CtMethodBuilder.create().publicAccess().returnType(CtClass.intType).name("method").body("return 42;").addToClass(ctClass);
-		return ctClass;
+	private ClassApiSignature createClassWithMethod(ClassApiSignatureSource classApiSignatureSource) throws NotFoundException, CannotCompileException {
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+		CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+		return classApiSignature;
 	}
 }

@@ -5,8 +5,8 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -68,9 +68,9 @@ public class PackageFilterTest {
 		assertThat(pf.matches(createCtClassForPackage("")), is(false));
 	}
 
-	private CtClass createCtClassForPackage(String packageName) {
+	private ClassApiSignature createCtClassForPackage(String packageName) {
 		String className = packageName + (packageName.isEmpty() ? "" : ".") + "Test";
-		return CtClassBuilder.create().name(className).addToClassPool(new ClassPool());
+		return CtClassBuilder.create().name(className).addToClassPool(new ClassApiSignatureSource());
 	}
 
 	@Test
@@ -80,16 +80,16 @@ public class PackageFilterTest {
 		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("include.exclude"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass toInclude = CtClassBuilder.create().name("include.ToInclude").addToClassPool(classPool);
-				CtClass toExclude = CtClassBuilder.create().name("include.exclude.ToExclude").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature toInclude = CtClassBuilder.create().name("include.ToInclude").addToClassPool(classApiSignatureSource);
+				ClassApiSignature toExclude = CtClassBuilder.create().name("include.exclude.ToExclude").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(toInclude, toExclude);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass toInclude = CtClassBuilder.create().name("include.ToInclude").addToClassPool(classPool);
-				CtClass toExclude = CtClassBuilder.create().name("include.exclude.ToExclude").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature toInclude = CtClassBuilder.create().name("include.ToInclude").addToClassPool(classApiSignatureSource);
+				ClassApiSignature toExclude = CtClassBuilder.create().name("include.exclude.ToExclude").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(toInclude, toExclude);
 			}
 		});

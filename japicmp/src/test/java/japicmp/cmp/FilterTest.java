@@ -8,8 +8,8 @@ import japicmp.model.JApiMethod;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import org.junit.Test;
 
 import java.lang.annotation.ElementType;
@@ -32,15 +32,15 @@ public class FilterTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				return Collections.singletonList(ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				return Collections.singletonList(ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				return Collections.singletonList(classApiSignature);
 			}
 		});
 		assertThat(jApiClasses.size(), is(1));
@@ -52,15 +52,15 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new JavaDocLikeClassFilter("japicmp.Test"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				return Collections.singletonList(ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				return Collections.singletonList(ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				return Collections.singletonList(classApiSignature);
 			}
 		});
 		assertThat(jApiClasses.size(), is(0));
@@ -72,16 +72,16 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new JavaDocLikeClassFilter("japicmp.Homer"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -94,16 +94,16 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new JavaDocLikeClassFilter("japicmp.*"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -116,16 +116,16 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new JavaDocLikeClassFilter("japicmp.T*"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -139,16 +139,16 @@ public class FilterTest {
 		options.getFilters().getIncludes().add(new JavadocLikePackageFilter("japicmp"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -162,16 +162,16 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new JavadocLikePackageFilter("japicmp"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Test1").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Test2").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -184,16 +184,16 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new JavaDocLikeClassFilter("japicmp.Test1"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -207,20 +207,20 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new JavaDocLikeClassFilter("big.bang.theory.Sheldon"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classPool);
-				CtClass ctClass3 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtClass ctClass4 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass3 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass4 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2, ctClass3, ctClass4);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classPool);
-				CtClass ctClass3 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtClass ctClass4 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("japicmp.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("japicmp.Marge").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass3 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass4 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2, ctClass3, ctClass4);
 			}
 		});
@@ -235,22 +235,22 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new JavadocLikeBehaviorFilter("big.bang.theory.Sheldon#study()"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -266,22 +266,22 @@ public class FilterTest {
 		options.getFilters().getIncludes().add(new JavadocLikeBehaviorFilter("big.bang.theory.Sheldon#study()"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -297,26 +297,26 @@ public class FilterTest {
 		options.getFilters().getIncludes().add(new JavadocLikeBehaviorFilter("big.bang.theory.Sheldon#study()"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
-				CtClass ctClass3 = CtClassBuilder.create().name("simpsons.Homer").addToClassPool(classPool);
-				CtClass ctClass4 = CtClassBuilder.create().name("simpsons.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
+				ClassApiSignature ctClass3 = CtClassBuilder.create().name("simpsons.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass4 = CtClassBuilder.create().name("simpsons.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2, ctClass3, ctClass4);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
-				CtClass ctClass3 = CtClassBuilder.create().name("simpsons.Homer").addToClassPool(classPool);
-				CtClass ctClass4 = CtClassBuilder.create().name("simpsons.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
+				ClassApiSignature ctClass3 = CtClassBuilder.create().name("simpsons.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass4 = CtClassBuilder.create().name("simpsons.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2, ctClass3, ctClass4);
 			}
 		});
@@ -332,26 +332,26 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new JavadocLikeBehaviorFilter("big.bang.theory.Sheldon#study()"));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
-				CtClass ctClass3 = CtClassBuilder.create().name("simpsons.Homer").addToClassPool(classPool);
-				CtClass ctClass4 = CtClassBuilder.create().name("simpsons.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
+				ClassApiSignature ctClass3 = CtClassBuilder.create().name("simpsons.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass4 = CtClassBuilder.create().name("simpsons.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2, ctClass3, ctClass4);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
-				CtClass ctClass3 = CtClassBuilder.create().name("simpsons.Homer").addToClassPool(classPool);
-				CtClass ctClass4 = CtClassBuilder.create().name("simpsons.Marge").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
+				ClassApiSignature ctClass3 = CtClassBuilder.create().name("simpsons.Homer").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass4 = CtClassBuilder.create().name("simpsons.Marge").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2, ctClass3, ctClass4);
 			}
 		});
@@ -372,16 +372,16 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new AnnotationClassFilter("@" + Exclude.class.getName()));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Exclude.class.getName()).addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Exclude.class.getName()).addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Exclude.class.getName()).addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Exclude.class.getName()).addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -395,22 +395,22 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new AnnotationBehaviorFilter("@" + Exclude.class.getName()));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -425,22 +425,22 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new AnnotationFieldFilter("@" + Exclude.class.getName()));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
-				CtFieldBuilder.create().name("name").type(classPool.getCtClass(String.class.getName())).addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtFieldBuilder.create().name("age").type(classApiSignatureSource.getCtClass(String.class.getName())).withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
+				CtFieldBuilder.create().name("name").type(classApiSignatureSource.getCtClass(String.class.getName())).addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
-				CtFieldBuilder.create().name("name").type(classPool.getCtClass(String.class.getName())).addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtFieldBuilder.create().name("age").type(classApiSignatureSource.getCtClass(String.class.getName())).withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
+				CtFieldBuilder.create().name("name").type(classApiSignatureSource.getCtClass(String.class.getName())).addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -460,16 +460,16 @@ public class FilterTest {
 		options.getFilters().getIncludes().add(new AnnotationClassFilter("@" + Include.class.getName()));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -483,22 +483,22 @@ public class FilterTest {
 		options.getFilters().getIncludes().add(new AnnotationBehaviorFilter("@" + Include.class.getName()));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").withAnnotation(Include.class.getName()).addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("study").withAnnotation(Include.class.getName()).addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("knowItAll").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("study").withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("knowItAll").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -513,22 +513,22 @@ public class FilterTest {
 		options.getFilters().getIncludes().add(new AnnotationFieldFilter("@" + Include.class.getName()));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).withAnnotation(Include.class.getName()).addToClass(ctClass1);
-				CtFieldBuilder.create().name("name").type(classPool.getCtClass(String.class.getName())).addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtFieldBuilder.create().name("age").type(classApiSignatureSource.getCtClass(String.class.getName())).withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtFieldBuilder.create().name("name").type(classApiSignatureSource.getCtClass(String.class.getName())).addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classPool);
-				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).withAnnotation(Include.class.getName()).addToClass(ctClass1);
-				CtFieldBuilder.create().name("name").type(classPool.getCtClass(String.class.getName())).addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("askSheldon").addToClass(ctClass2);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").addToClassPool(classApiSignatureSource);
+				CtFieldBuilder.create().name("age").type(classApiSignatureSource.getCtClass(String.class.getName())).withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtFieldBuilder.create().name("name").type(classApiSignatureSource.getCtClass(String.class.getName())).addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("askSheldon").addToClass(ctClass2);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -542,18 +542,18 @@ public class FilterTest {
 		options.getFilters().getIncludes().add(new AnnotationClassFilter("@" + Include.class.getName()));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(classPool.getCtClass(String.class.getName())).name("getName").addToClass(ctClass1);
-				CtFieldBuilder.create().type(classPool.getCtClass(Integer.class.getName())).name("age").addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(classApiSignatureSource.getCtClass(String.class.getName())).name("getName").addToClass(ctClass1);
+				CtFieldBuilder.create().type(classApiSignatureSource.getCtClass(Integer.class.getName())).name("age").addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});
@@ -572,19 +572,19 @@ public class FilterTest {
 		options.getFilters().getExcludes().add(new AnnotationBehaviorFilter("@" + Exclude.class.getName()));
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
-				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classApiSignatureSource);
+				CtFieldBuilder.create().name("age").type(classApiSignatureSource.getCtClass(String.class.getName())).addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classPool);
-				CtFieldBuilder.create().name("age").type(classPool.getCtClass(String.class.getName())).withAnnotation(Include.class.getName()).addToClass(ctClass1);
-				CtMethodBuilder.create().publicAccess().returnType(classPool.getCtClass(String.class.getName())).name("getName").withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
-				CtClass ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClass1 = CtClassBuilder.create().name("big.bang.theory.Sheldon").withAnnotation(Include.class.getName()).addToClassPool(classApiSignatureSource);
+				CtFieldBuilder.create().name("age").type(classApiSignatureSource.getCtClass(String.class.getName())).withAnnotation(Include.class.getName()).addToClass(ctClass1);
+				CtMethodBuilder.create().publicAccess().returnType(classApiSignatureSource.getCtClass(String.class.getName())).name("getName").withAnnotation(Exclude.class.getName()).addToClass(ctClass1);
+				ClassApiSignature ctClass2 = CtClassBuilder.create().name("big.bang.theory.Leonard").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(ctClass1, ctClass2);
 			}
 		});

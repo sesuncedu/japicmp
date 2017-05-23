@@ -1,7 +1,7 @@
 package japicmp.util;
 
 import javassist.CannotCompileException;
-import javassist.CtClass;
+
 import javassist.CtConstructor;
 import javassist.CtNewConstructor;
 
@@ -17,15 +17,15 @@ public class CtConstructorBuilder extends CtBehaviorBuilder {
 		return this;
 	}
 
-	public CtConstructorBuilder parameters(CtClass[] parameters) {
+	public CtConstructorBuilder parameters(ClassApiSignature[] parameters) {
 		return (CtConstructorBuilder) super.parameters(parameters);
 	}
 
-	public CtConstructorBuilder parameter(CtClass parameter) {
+	public CtConstructorBuilder parameter(ClassApiSignature parameter) {
 		return (CtConstructorBuilder) super.parameter(parameter);
 	}
 
-	public CtConstructorBuilder exceptions(CtClass[] exceptions) {
+	public CtConstructorBuilder exceptions(ClassApiSignature[] exceptions) {
 		return (CtConstructorBuilder) super.exceptions(exceptions);
 	}
 
@@ -46,7 +46,7 @@ public class CtConstructorBuilder extends CtBehaviorBuilder {
 		return (CtConstructorBuilder) super.privateAccess();
 	}
 
-	public CtConstructor addToClass(CtClass declaringClass) throws CannotCompileException {
+	public CtConstructor addToClass(ClassApiSignature declaringClass) throws CannotCompileException {
 		CtConstructor ctConstructor = CtNewConstructor.make(this.parameters, this.exceptions, this.body, declaringClass);
 		ctConstructor.setModifiers(this.modifier);
 		declaringClass.addConstructor(ctConstructor);

@@ -1,8 +1,8 @@
 package japicmp.model;
 
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
-import javassist.CtClass;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
@@ -11,27 +11,27 @@ public class JApiException implements JApiHasChangeStatus {
 	private final JApiChangeStatus changeStatus;
 	private final boolean checkedException;
 
-	public JApiException(JarArchiveComparator jarArchiveComparator, String name, Optional<CtClass> ctClassOptional, JApiChangeStatus changeStatus) {
+	public JApiException(JarArchiveComparator jarArchiveComparator, String name, Optional<ClassApiSignature> ctClassOptional, JApiChangeStatus changeStatus) {
 		this.name = name;
 		this.changeStatus = changeStatus;
 		this.checkedException = isCheckedException(ctClassOptional, jarArchiveComparator);
 	}
 
-	private boolean isCheckedException(Optional<CtClass> ctClassOptional, JarArchiveComparator jarArchiveComparator) throws OutOfMemoryError {
+	private boolean isCheckedException(Optional<ClassApiSignature> ctClassOptional, JarArchiveComparator jarArchiveComparator) throws OutOfMemoryError {
 		boolean checkedException = false;
 		if (ctClassOptional.isPresent()) {
 			boolean subClassOfException = false;
-			CtClass ctClass = ctClassOptional.get();
-			Optional<CtClass> exceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, Exception.class.getName());
+			ClassApiSignature classApiSignature = ctClassOptional.get();
+			Optional<ClassApiSignature> exceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, Exception.class.getName());
 			if (exceptionOptional.isPresent()) {
-				if (ctClass.subclassOf(exceptionOptional.get())) {
+				if (classApiSignature.subclassOf(exceptionOptional.get())) {
 					subClassOfException = true;
 				}
 			}
 			if (subClassOfException) {
-				Optional<CtClass> runtimeExceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, RuntimeException.class.getName());
+				Optional<ClassApiSignature> runtimeExceptionOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, RuntimeException.class.getName());
 				if (runtimeExceptionOptional.isPresent()) {
-					if (!ctClass.subclassOf(runtimeExceptionOptional.get())) {
+					if (!classApiSignature.subclassOf(runtimeExceptionOptional.get())) {
 						checkedException = true;
 					}
 				}

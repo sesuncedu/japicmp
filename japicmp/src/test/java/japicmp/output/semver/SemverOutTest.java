@@ -4,8 +4,8 @@ import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import org.junit.Test;
 
 import java.util.Collections;
@@ -20,12 +20,12 @@ public class SemverOutTest {
 	public void testNoChangesAtAll() throws Exception {
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(new JarArchiveComparatorOptions(), new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				return Collections.emptyList();
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				return Collections.emptyList();
 			}
 		});

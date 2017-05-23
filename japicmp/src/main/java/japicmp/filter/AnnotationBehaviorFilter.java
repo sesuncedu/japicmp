@@ -1,7 +1,7 @@
 package japicmp.filter;
 
 import javassist.CtBehavior;
-import javassist.CtClass;
+
 import javassist.NotFoundException;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class AnnotationBehaviorFilter extends AnnotationFilterBase implements Be
 		List attributes = ctBehavior.getMethodInfo().getAttributes();
 		boolean hasAnnotation = hasAnnotation(attributes);
 		if (!hasAnnotation) {
-			CtClass declaringClass = ctBehavior.getDeclaringClass();
+			ClassApiSignature declaringClass = ctBehavior.getDeclaringClass();
 			hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());
 			if (!hasAnnotation) {
 				try {

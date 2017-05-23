@@ -1,12 +1,20 @@
 package japicmp.util;
 
+import com.criticollab.japicmp.classinfo.ApiBehavior;
+import com.criticollab.japicmp.classinfo.ApiField;
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
-import japicmp.model.*;
-import javassist.CtBehavior;
-import javassist.CtClass;
-import javassist.CtField;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiAttribute;
+import japicmp.model.JApiCanBeSynthetic;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiHasAccessModifier;
+import japicmp.model.JApiModifier;
+import japicmp.model.JApiModifierBase;
+import japicmp.model.SyntheticAttribute;
+import japicmp.model.SyntheticModifier;
 
 import java.lang.reflect.Modifier;
 
@@ -87,15 +95,15 @@ public class ModifierHelper {
 	}
 
 	public interface ExtractModifierFromClassCallback<T extends JApiModifierBase> {
-		T getModifierForOld(CtClass oldClass);
+		T getModifierForOld(ClassApiSignature oldClass);
 
-		T getModifierForNew(CtClass newClass);
+		T getModifierForNew(ClassApiSignature newClass);
 	}
 
-	public static <T extends JApiModifierBase> JApiModifier<T> extractModifierFromClass(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional, ExtractModifierFromClassCallback<T> callback) {
+	public static <T extends JApiModifierBase> JApiModifier<T> extractModifierFromClass(Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional, ExtractModifierFromClassCallback<T> callback) {
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			CtClass oldClass = oldClassOptional.get();
-			CtClass newClass = newClassOptional.get();
+			ClassApiSignature oldClass = oldClassOptional.get();
+			ClassApiSignature newClass = newClassOptional.get();
 			T oldClassModifier = callback.getModifierForOld(oldClass);
 			T newClassModifier = callback.getModifierForNew(newClass);
 			if (oldClassModifier != newClassModifier) {
@@ -105,12 +113,12 @@ public class ModifierHelper {
 			}
 		} else {
 			if (oldClassOptional.isPresent()) {
-				CtClass oldClass = oldClassOptional.get();
+				ClassApiSignature oldClass = oldClassOptional.get();
 				T oldClassModifier = callback.getModifierForOld(oldClass);
 				return new JApiModifier<T>(Optional.of(oldClassModifier), Optional.<T>absent(), JApiChangeStatus.REMOVED);
 			}
 			if (newClassOptional.isPresent()) {
-				CtClass newClass = newClassOptional.get();
+				ClassApiSignature newClass = newClassOptional.get();
 				T newClassModifier = callback.getModifierForNew(newClass);
 				return new JApiModifier<T>(Optional.<T>absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);
 			}
@@ -119,15 +127,15 @@ public class ModifierHelper {
 	}
 
 	public interface ExtractModifierFromBehaviorCallback<T extends JApiModifierBase> {
-		T getModifierForOld(CtBehavior oldClass);
+		T getModifierForOld(ApiBehavior oldClass);
 
-		T getModifierForNew(CtBehavior newClass);
+		T getModifierForNew(ApiBehavior newClass);
 	}
 
-	public static <T extends JApiModifierBase> JApiModifier<T> extractModifierFromBehavior(Optional<? extends CtBehavior> oldClassOptional, Optional<? extends CtBehavior> newClassOptional, ExtractModifierFromBehaviorCallback<T> callback) {
+	public static <T extends JApiModifierBase> JApiModifier<T> extractModifierFromBehavior(Optional<? extends ApiBehavior> oldClassOptional, Optional<? extends ApiBehavior> newClassOptional, ExtractModifierFromBehaviorCallback<T> callback) {
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			CtBehavior oldClass = oldClassOptional.get();
-			CtBehavior newClass = newClassOptional.get();
+			ApiBehavior oldClass = oldClassOptional.get();
+			ApiBehavior newClass = newClassOptional.get();
 			T oldClassModifier = callback.getModifierForOld(oldClass);
 			T newClassModifier = callback.getModifierForNew(newClass);
 			if (oldClassModifier != newClassModifier) {
@@ -137,12 +145,12 @@ public class ModifierHelper {
 			}
 		} else {
 			if (oldClassOptional.isPresent()) {
-				CtBehavior oldClass = oldClassOptional.get();
+				ApiBehavior oldClass = oldClassOptional.get();
 				T oldClassModifier = callback.getModifierForOld(oldClass);
 				return new JApiModifier<T>(Optional.of(oldClassModifier), Optional.<T>absent(), JApiChangeStatus.REMOVED);
 			}
 			if (newClassOptional.isPresent()) {
-				CtBehavior newClass = newClassOptional.get();
+				ApiBehavior newClass = newClassOptional.get();
 				T newClassModifier = callback.getModifierForNew(newClass);
 				return new JApiModifier<T>(Optional.<T>absent(), Optional.of(newClassModifier), JApiChangeStatus.NEW);
 			}
@@ -151,15 +159,15 @@ public class ModifierHelper {
 	}
 
 	public interface ExtractModifierFromFieldCallback<T extends JApiModifierBase> {
-		T getModifierForOld(CtField oldField);
+		T getModifierForOld(ApiField oldField);
 
-		T getModifierForNew(CtField newField);
+		T getModifierForNew(ApiField newField);
 	}
 
-	public static <T extends JApiModifierBase> JApiModifier<T> extractModifierFromField(Optional<CtField> oldFieldOptional, Optional<CtField> newFieldOptional, ExtractModifierFromFieldCallback<T> callback) {
+	public static <T extends JApiModifierBase> JApiModifier<T> extractModifierFromField(Optional<ApiField> oldFieldOptional, Optional<ApiField> newFieldOptional, ExtractModifierFromFieldCallback<T> callback) {
 		if (oldFieldOptional.isPresent() && newFieldOptional.isPresent()) {
-			CtField oldField = oldFieldOptional.get();
-			CtField newField = newFieldOptional.get();
+			ApiField oldField = oldFieldOptional.get();
+			ApiField newField = newFieldOptional.get();
 			T oldFieldModifier = callback.getModifierForOld(oldField);
 			T newFieldModifier = callback.getModifierForNew(newField);
 			if (oldFieldModifier != newFieldModifier) {
@@ -169,12 +177,12 @@ public class ModifierHelper {
 			}
 		} else {
 			if (oldFieldOptional.isPresent()) {
-				CtField oldField = oldFieldOptional.get();
+				ApiField oldField = oldFieldOptional.get();
 				T oldFieldModifier = callback.getModifierForOld(oldField);
 				return new JApiModifier<T>(Optional.of(oldFieldModifier), Optional.<T>absent(), JApiChangeStatus.REMOVED);
 			}
 			if (newFieldOptional.isPresent()) {
-				CtField newField = newFieldOptional.get();
+				ApiField newField = newFieldOptional.get();
 				T newFieldModifier = callback.getModifierForNew(newField);
 				return new JApiModifier<T>(Optional.<T>absent(), Optional.of(newFieldModifier), JApiChangeStatus.NEW);
 			}

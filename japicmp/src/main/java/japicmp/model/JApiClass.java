@@ -1,18 +1,35 @@
 package japicmp.model;
 
+import com.criticollab.japicmp.classinfo.ApiField;
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
-import japicmp.util.*;
-import javassist.*;
+import japicmp.util.AnnotationHelper;
+import japicmp.util.Constants;
+import japicmp.util.MethodDescriptorParser;
+import japicmp.util.ModifierHelper;
+import japicmp.util.SignatureParser;
+import javassist.CtConstructor;
+import javassist.ApiField;
+import javassist.CtMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHasAccessModifier, JApiHasStaticModifier, JApiHasFinalModifier, JApiHasAbstractModifier,
 	JApiCompatibility, JApiHasAnnotations, JApiJavaObjectSerializationCompatibility, JApiCanBeSynthetic {
@@ -20,8 +37,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private final String fullyQualifiedName;
 	private final JApiClassType classType;
 	private final JarArchiveComparatorOptions options;
-	private final Optional<CtClass> oldClass;
-	private final Optional<CtClass> newClass;
+	private final Optional<ClassApiSignature> oldClass;
+	private final Optional<ClassApiSignature> newClass;
 	private final JApiChangeStatus changeStatus;
 	private final JApiSuperclass superclass;
 	private final List<JApiImplementedInterface> interfaces = new LinkedList<>();
@@ -40,7 +57,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private JApiJavaObjectSerializationChangeStatus jApiJavaObjectSerializationChangeStatus = JApiJavaObjectSerializationChangeStatus.NOT_SERIALIZABLE;
 	private boolean changeCausedByClassElement = false;
 
-	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<CtClass> oldClass, Optional<CtClass> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
+	public JApiClass(JarArchiveComparator jarArchiveComparator, String fullyQualifiedName, Optional<ClassApiSignature> oldClass, Optional<ClassApiSignature> newClass, JApiChangeStatus changeStatus, JApiClassType classType) {
 		this.jarArchiveComparator = jarArchiveComparator;
 		this.options = this.jarArchiveComparator.getJarArchiveComparatorOptions();
 		this.fullyQualifiedName = fullyQualifiedName;
@@ -62,20 +79,20 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 	}
 
-	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
-		AnnotationHelper.computeAnnotationChanges(annotations, oldClassOptional, newClassOptional, options, new AnnotationHelper.AnnotationsAttributeCallback<CtClass>() {
+	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
+		AnnotationHelper.computeAnnotationChanges(annotations, oldClassOptional, newClassOptional, options, new AnnotationHelper.AnnotationsAttributeCallback<ClassApiSignature>() {
 			@Override
-			public AnnotationsAttribute getAnnotationsAttribute(CtClass ctClass) {
-				return (AnnotationsAttribute) ctClass.getClassFile().getAttribute(AnnotationsAttribute.visibleTag);
+			public AnnotationsAttribute getAnnotationsAttribute(ClassApiSignature classApiSignature) {
+				return (AnnotationsAttribute) classApiSignature.getClassFile().getAttribute(AnnotationsAttribute.visibleTag);
 			}
 		});
 	}
 
-	private JApiAttribute<SyntheticAttribute> extractSyntheticAttribute(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+	private JApiAttribute<SyntheticAttribute> extractSyntheticAttribute(Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		JApiAttribute<SyntheticAttribute> jApiAttribute = new JApiAttribute<>(JApiChangeStatus.UNCHANGED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.of(SyntheticAttribute.SYNTHETIC));
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			CtClass oldClass = oldClassOptional.get();
-			CtClass newClass = newClassOptional.get();
+			ClassApiSignature oldClass = oldClassOptional.get();
+			ClassApiSignature newClass = newClassOptional.get();
 			byte[] attributeOldClass = oldClass.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 			byte[] attributeNewClass = newClass.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 			if (attributeOldClass != null && attributeNewClass != null) {
@@ -89,8 +106,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		} else {
 			if (oldClassOptional.isPresent()) {
-				CtClass ctClass = oldClassOptional.get();
-				byte[] attribute = ctClass.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+				ClassApiSignature classApiSignature = oldClassOptional.get();
+				byte[] attribute = classApiSignature.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 				if (attribute != null) {
 					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.REMOVED, Optional.of(SyntheticAttribute.SYNTHETIC), Optional.<SyntheticAttribute>absent());
 				} else {
@@ -98,8 +115,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 				}
 			}
 			if (newClassOptional.isPresent()) {
-				CtClass ctClass = newClassOptional.get();
-				byte[] attribute = ctClass.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
+				ClassApiSignature classApiSignature = newClassOptional.get();
+				byte[] attribute = classApiSignature.getAttribute(Constants.JAVA_CONSTPOOL_ATTRIBUTE_SYNTHETIC);
 				if (attribute != null) {
 					jApiAttribute = new JApiAttribute<>(JApiChangeStatus.NEW, Optional.<SyntheticAttribute>absent(), Optional.of(SyntheticAttribute.SYNTHETIC));
 				} else {
@@ -110,31 +127,31 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return jApiAttribute;
 	}
 
-	private void computeFieldChanges(List<JApiField> fields, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+	private void computeFieldChanges(List<JApiField> fields, Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			CtClass oldClass = oldClassOptional.get();
-			CtClass newClass = newClassOptional.get();
-			Map<String, CtField> oldFieldsMap = buildFieldMap(oldClass);
-			Map<String, CtField> newFieldsMap = buildFieldMap(newClass);
-			for (CtField oldField : oldFieldsMap.values()) {
+			ClassApiSignature oldClass = oldClassOptional.get();
+			ClassApiSignature newClass = newClassOptional.get();
+			Map<String, ApiField> oldFieldsMap = buildFieldMap(oldClass);
+			Map<String, ApiField> newFieldsMap = buildFieldMap(newClass);
+			for (ApiField oldField : oldFieldsMap.values()) {
 				String oldFieldName = oldField.getName();
-				CtField newField = newFieldsMap.get(oldFieldName);
+				ApiField newField = newFieldsMap.get(oldFieldName);
 				if (newField != null) {
 					JApiField jApiField = new JApiField(this, JApiChangeStatus.UNCHANGED, Optional.of(oldField), Optional.of(newField), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				} else {
-					JApiField jApiField = new JApiField(this, JApiChangeStatus.REMOVED, Optional.of(oldField), Optional.<CtField>absent(), options);
+					JApiField jApiField = new JApiField(this, JApiChangeStatus.REMOVED, Optional.of(oldField), Optional.<ApiField>absent(), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				}
 			}
-			for (CtField newField : newFieldsMap.values()) {
-				CtField oldField = oldFieldsMap.get(newField.getName());
+			for (ApiField newField : newFieldsMap.values()) {
+				ApiField oldField = oldFieldsMap.get(newField.getName());
 				if (oldField == null) {
-					JApiField jApiField = new JApiField(this, JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(newField), options);
+					JApiField jApiField = new JApiField(this, JApiChangeStatus.NEW, Optional.<ApiField>absent(), Optional.of(newField), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
@@ -142,18 +159,18 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		} else {
 			if (oldClassOptional.isPresent()) {
-				Map<String, CtField> fieldMap = buildFieldMap(oldClassOptional.get());
-				for (CtField field : fieldMap.values()) {
-					JApiField jApiField = new JApiField(this, JApiChangeStatus.REMOVED, Optional.of(field), Optional.<CtField>absent(), options);
+				Map<String, ApiField> fieldMap = buildFieldMap(oldClassOptional.get());
+				for (ApiField field : fieldMap.values()) {
+					JApiField jApiField = new JApiField(this, JApiChangeStatus.REMOVED, Optional.of(field), Optional.<ApiField>absent(), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
 				}
 			}
 			if (newClassOptional.isPresent()) {
-				Map<String, CtField> fieldMap = buildFieldMap(newClassOptional.get());
-				for (CtField field : fieldMap.values()) {
-					JApiField jApiField = new JApiField(this, JApiChangeStatus.NEW, Optional.<CtField>absent(), Optional.of(field), options);
+				Map<String, ApiField> fieldMap = buildFieldMap(newClassOptional.get());
+				for (ApiField field : fieldMap.values()) {
+					JApiField jApiField = new JApiField(this, JApiChangeStatus.NEW, Optional.<ApiField>absent(), Optional.of(field), options);
 					if (includeField(jApiField)) {
 						fields.add(jApiField);
 					}
@@ -166,10 +183,10 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return ModifierHelper.matchesModifierLevel(jApiField, options.getAccessModifier());
 	}
 
-	private Map<String, CtField> buildFieldMap(CtClass ctClass) {
-		Map<String, CtField> fieldMap = new HashMap<>();
-		CtField[] declaredFields = ctClass.getDeclaredFields();
-		for (CtField field : declaredFields) {
+	private Map<String, ApiField> buildFieldMap(ClassApiSignature classApiSignature) {
+		Map<String, ApiField> fieldMap = new HashMap<>();
+		ApiField[] declaredFields = classApiSignature.getDeclaredFields();
+		for (ApiField field : declaredFields) {
 			if (options.getFilters().includeField(field)) {
 				String name = field.getName();
 				fieldMap.put(name, field);
@@ -178,13 +195,13 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return fieldMap;
 	}
 
-	private JApiSuperclass extractSuperclass(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
-		JApiSuperclass retVal = new JApiSuperclass(this, Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.UNCHANGED, jarArchiveComparator);
+	private JApiSuperclass extractSuperclass(Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
+		JApiSuperclass retVal = new JApiSuperclass(this, Optional.<ClassApiSignature>absent(), Optional.<ClassApiSignature>absent(), JApiChangeStatus.UNCHANGED, jarArchiveComparator);
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			CtClass oldClass = oldClassOptional.get();
-			CtClass newClass = newClassOptional.get();
-			Optional<CtClass> superclassOldOptional = getSuperclass(oldClass);
-			Optional<CtClass> superclassNewOptional = getSuperclass(newClass);
+			ClassApiSignature oldClass = oldClassOptional.get();
+			ClassApiSignature newClass = newClassOptional.get();
+			Optional<ClassApiSignature> superclassOldOptional = getSuperclass(oldClass);
+			Optional<ClassApiSignature> superclassNewOptional = getSuperclass(newClass);
 			if (superclassOldOptional.isPresent() && superclassNewOptional.isPresent()) {
 				String nameOld = superclassOldOptional.get().getName();
 				String nameNew = superclassNewOptional.get().getName();
@@ -198,18 +215,18 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		} else {
 			if (oldClassOptional.isPresent()) {
-				Optional<CtClass> superclassOldOptional = getSuperclass(oldClassOptional.get());
+				Optional<ClassApiSignature> superclassOldOptional = getSuperclass(oldClassOptional.get());
 				if (superclassOldOptional.isPresent()) {
-					retVal = new JApiSuperclass(this, superclassOldOptional, Optional.<CtClass>absent(), JApiChangeStatus.REMOVED, jarArchiveComparator);
+					retVal = new JApiSuperclass(this, superclassOldOptional, Optional.<ClassApiSignature>absent(), JApiChangeStatus.REMOVED, jarArchiveComparator);
 				} else {
-					retVal = new JApiSuperclass(this, Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.UNCHANGED, jarArchiveComparator);
+					retVal = new JApiSuperclass(this, Optional.<ClassApiSignature>absent(), Optional.<ClassApiSignature>absent(), JApiChangeStatus.UNCHANGED, jarArchiveComparator);
 				}
 			} else if (newClassOptional.isPresent()) {
-				Optional<CtClass> superclassNewOptional = getSuperclass(newClassOptional.get());
+				Optional<ClassApiSignature> superclassNewOptional = getSuperclass(newClassOptional.get());
 				if (superclassNewOptional.isPresent()) {
-					retVal = new JApiSuperclass(this, Optional.<CtClass>absent(), superclassNewOptional, JApiChangeStatus.NEW, jarArchiveComparator);
+					retVal = new JApiSuperclass(this, Optional.<ClassApiSignature>absent(), superclassNewOptional, JApiChangeStatus.NEW, jarArchiveComparator);
 				} else {
-					retVal = new JApiSuperclass(this, Optional.<CtClass>absent(), Optional.<CtClass>absent(), JApiChangeStatus.UNCHANGED, jarArchiveComparator);
+					retVal = new JApiSuperclass(this, Optional.<ClassApiSignature>absent(), Optional.<ClassApiSignature>absent(), JApiChangeStatus.UNCHANGED, jarArchiveComparator);
 				}
 			}
 		}
@@ -217,11 +234,11 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return retVal;
 	}
 
-	private Optional<CtClass> getSuperclass(CtClass ctClass) {
+	private Optional<ClassApiSignature> getSuperclass(ClassApiSignature classApiSignature) {
 		try {
-			CtClass superClass = ctClass.getSuperclass();
+			ClassApiSignature superClass = classApiSignature.getSuperclass();
 			return Optional.fromNullable(superClass);
-		} catch (NotFoundException e) {
+		} catch (NoSuchElementException e) {
 			if (options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 				return Optional.absent();
 			} else {
@@ -230,14 +247,14 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 	}
 
-	private void computeInterfaceChanges(List<JApiImplementedInterface> interfacesArg, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+	private void computeInterfaceChanges(List<JApiImplementedInterface> interfacesArg, Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
-			CtClass oldClass = oldClassOptional.get();
-			CtClass newClass = newClassOptional.get();
-			Map<String, CtClass> interfaceMapOldClass = buildInterfaceMap(oldClass, JarArchiveComparator.ArchiveType.OLD);
-			Map<String, CtClass> interfaceMapNewClass = buildInterfaceMap(newClass, JarArchiveComparator.ArchiveType.NEW);
-			for (CtClass oldInterface : interfaceMapOldClass.values()) {
-				CtClass ctClassFound = interfaceMapNewClass.get(oldInterface.getName());
+			ClassApiSignature oldClass = oldClassOptional.get();
+			ClassApiSignature newClass = newClassOptional.get();
+			Map<String, ClassApiSignature> interfaceMapOldClass = buildInterfaceMap(oldClass, JarArchiveComparator.ArchiveType.OLD);
+			Map<String, ClassApiSignature> interfaceMapNewClass = buildInterfaceMap(newClass, JarArchiveComparator.ArchiveType.NEW);
+			for (ClassApiSignature oldInterface : interfaceMapOldClass.values()) {
+				ClassApiSignature ctClassFound = interfaceMapNewClass.get(oldInterface.getName());
 				if (ctClassFound != null) {
 					JApiImplementedInterface jApiClass = new JApiImplementedInterface(oldInterface, oldInterface.getName(), JApiChangeStatus.UNCHANGED);
 					interfacesArg.add(jApiClass);
@@ -246,8 +263,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 					interfacesArg.add(jApiClass);
 				}
 			}
-			for (CtClass newInterface : interfaceMapNewClass.values()) {
-				CtClass ctClassFound = interfaceMapOldClass.get(newInterface.getName());
+			for (ClassApiSignature newInterface : interfaceMapNewClass.values()) {
+				ClassApiSignature ctClassFound = interfaceMapOldClass.get(newInterface.getName());
 				if (ctClassFound == null) {
 					JApiImplementedInterface jApiClass = new JApiImplementedInterface(newInterface, newInterface.getName(), JApiChangeStatus.NEW);
 					interfacesArg.add(jApiClass);
@@ -255,35 +272,35 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		} else {
 			if (oldClassOptional.isPresent()) {
-				Map<String, CtClass> interfaceMap = buildInterfaceMap(oldClassOptional.get(), JarArchiveComparator.ArchiveType.OLD);
-				for (CtClass ctClass : interfaceMap.values()) {
-					JApiImplementedInterface jApiClass = new JApiImplementedInterface(ctClass, ctClass.getName(), JApiChangeStatus.REMOVED);
+				Map<String, ClassApiSignature> interfaceMap = buildInterfaceMap(oldClassOptional.get(), JarArchiveComparator.ArchiveType.OLD);
+				for (ClassApiSignature classApiSignature : interfaceMap.values()) {
+					JApiImplementedInterface jApiClass = new JApiImplementedInterface(classApiSignature, classApiSignature.getName(), JApiChangeStatus.REMOVED);
 					interfacesArg.add(jApiClass);
 				}
 			} else if (newClassOptional.isPresent()) {
-				Map<String, CtClass> interfaceMap = buildInterfaceMap(newClassOptional.get(), JarArchiveComparator.ArchiveType.NEW);
-				for (CtClass ctClass : interfaceMap.values()) {
-					JApiImplementedInterface jApiClass = new JApiImplementedInterface(ctClass, ctClass.getName(), JApiChangeStatus.NEW);
+				Map<String, ClassApiSignature> interfaceMap = buildInterfaceMap(newClassOptional.get(), JarArchiveComparator.ArchiveType.NEW);
+				for (ClassApiSignature classApiSignature : interfaceMap.values()) {
+					JApiImplementedInterface jApiClass = new JApiImplementedInterface(classApiSignature, classApiSignature.getName(), JApiChangeStatus.NEW);
 					interfacesArg.add(jApiClass);
 				}
 			}
 		}
 	}
 
-	private Map<String, CtClass> buildInterfaceMap(CtClass ctClass, JarArchiveComparator.ArchiveType archiveType) {
-		Map<String, CtClass> map = new HashMap<>();
-		buildInterfaceMap(ctClass, archiveType, map);
+	private Map<String, ClassApiSignature> buildInterfaceMap(ClassApiSignature classApiSignature, JarArchiveComparator.ArchiveType archiveType) {
+		Map<String, ClassApiSignature> map = new HashMap<>();
+		buildInterfaceMap(classApiSignature, archiveType, map);
 		return map;
 	}
 
-	private void buildInterfaceMap(CtClass ctClass, JarArchiveComparator.ArchiveType archiveType, Map<String, CtClass> map) {
+	private void buildInterfaceMap(ClassApiSignature classApiSignature, JarArchiveComparator.ArchiveType archiveType, Map<String, ClassApiSignature> map) {
 		try {
-			CtClass[] interfaces = ctClass.getInterfaces();
-			for (CtClass ctInterface : interfaces) {
+			ClassApiSignature[] interfaces = classApiSignature.getInterfaces();
+			for (ClassApiSignature ctInterface : interfaces) {
 				map.put(ctInterface.getName(), ctInterface);
 				buildInterfaceMap(archiveType, map, ctInterface);
 			}
-			Optional<CtClass> superClassOptional = getSuperclass(ctClass);
+			Optional<ClassApiSignature> superClassOptional = getSuperclass(classApiSignature);
 			if (superClassOptional.isPresent()) {
 				buildInterfaceMap(superClassOptional.get(), archiveType, map);
 			}
@@ -294,19 +311,19 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 	}
 
-	private void buildInterfaceMap(JarArchiveComparator.ArchiveType archiveType, Map<String, CtClass> map, CtClass ctInterface) throws NotFoundException {
-		Optional<CtClass> loadedInterfaceOptional = this.jarArchiveComparator.loadClass(archiveType, ctInterface.getName());
+	private void buildInterfaceMap(JarArchiveComparator.ArchiveType archiveType, Map<String, ClassApiSignature> map, ClassApiSignature ctInterface) throws NotFoundException {
+		Optional<ClassApiSignature> loadedInterfaceOptional = this.jarArchiveComparator.loadClass(archiveType, ctInterface.getName());
 		if (loadedInterfaceOptional.isPresent()) {
-			CtClass loadedInterface = loadedInterfaceOptional.get();
-			CtClass[] loadedInterfaceInterfaces = loadedInterface.getInterfaces();
-			for (CtClass additionalInterface : loadedInterfaceInterfaces) {
+			ClassApiSignature loadedInterface = loadedInterfaceOptional.get();
+			ClassApiSignature[] loadedInterfaceInterfaces = loadedInterface.getInterfaces();
+			for (ClassApiSignature additionalInterface : loadedInterfaceInterfaces) {
 				map.put(additionalInterface.getName(), additionalInterface);
 				buildInterfaceMap(archiveType, map, additionalInterface);
 			}
 		}
 	}
 
-	private void computeMethodChanges(JApiClass jApiClass, Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+	private void computeMethodChanges(JApiClass jApiClass, Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		Map<String, List<CtMethod>> oldMethodsMap = createMethodMap(oldClassOptional);
 		Map<String, List<CtMethod>> newMethodsMap = createMethodMap(newClassOptional);
 		sortMethodsIntoLists(jApiClass, oldMethodsMap, newMethodsMap);
@@ -480,11 +497,11 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 	}
 
-	private Map<String, List<CtMethod>> createMethodMap(Optional<CtClass> ctClassOptional) {
+	private Map<String, List<CtMethod>> createMethodMap(Optional<ClassApiSignature> ctClassOptional) {
 		Map<String, List<CtMethod>> methods = new HashMap<>();
 		if (ctClassOptional.isPresent()) {
-			CtClass ctClass = ctClassOptional.get();
-			for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
+			ClassApiSignature classApiSignature = ctClassOptional.get();
+			for (CtMethod ctMethod : classApiSignature.getDeclaredMethods()) {
 				if (options.getFilters().includeBehavior(ctMethod)) {
 					String name = ctMethod.getName();
 					List<CtMethod> ctMethods = methods.get(name);
@@ -499,10 +516,10 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return methods;
 	}
 
-	private Map<String, CtConstructor> createConstructorMap(Optional<CtClass> ctClass) {
+	private Map<String, CtConstructor> createConstructorMap(Optional<ClassApiSignature> classApiSignature) {
 		Map<String, CtConstructor> methods = new HashMap<>();
-		if (ctClass.isPresent()) {
-			for (CtConstructor ctConstructor : ctClass.get().getDeclaredConstructors()) {
+		if (classApiSignature.isPresent()) {
+			for (CtConstructor ctConstructor : classApiSignature.get().getDeclaredConstructors()) {
 				if (options.getFilters().includeBehavior(ctConstructor)) {
 					methods.put(ctConstructor.getLongName(), ctConstructor);
 				}
@@ -558,71 +575,71 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return changeStatus;
 	}
 
-	private JApiModifier<StaticModifier> extractStaticModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+	private JApiModifier<StaticModifier> extractStaticModifier(Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		return ModifierHelper.extractModifierFromClass(oldClassOptional, newClassOptional, new ModifierHelper.ExtractModifierFromClassCallback<StaticModifier>() {
 			@Override
-			public StaticModifier getModifierForOld(CtClass oldClass) {
+			public StaticModifier getModifierForOld(ClassApiSignature oldClass) {
 				return Modifier.isStatic(oldClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
 			}
 
 			@Override
-			public StaticModifier getModifierForNew(CtClass newClass) {
+			public StaticModifier getModifierForNew(ClassApiSignature newClass) {
 				return Modifier.isStatic(newClass.getModifiers()) ? StaticModifier.STATIC : StaticModifier.NON_STATIC;
 			}
 		});
 	}
 
-	private JApiModifier<FinalModifier> extractFinalModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+	private JApiModifier<FinalModifier> extractFinalModifier(Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		return ModifierHelper.extractModifierFromClass(oldClassOptional, newClassOptional, new ModifierHelper.ExtractModifierFromClassCallback<FinalModifier>() {
 			@Override
-			public FinalModifier getModifierForOld(CtClass oldClass) {
+			public FinalModifier getModifierForOld(ClassApiSignature oldClass) {
 				return Modifier.isFinal(oldClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
 			}
 
 			@Override
-			public FinalModifier getModifierForNew(CtClass newClass) {
+			public FinalModifier getModifierForNew(ClassApiSignature newClass) {
 				return Modifier.isFinal(newClass.getModifiers()) ? FinalModifier.FINAL : FinalModifier.NON_FINAL;
 			}
 		});
 	}
 
-	private JApiModifier<AccessModifier> extractAccessModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+	private JApiModifier<AccessModifier> extractAccessModifier(Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		return ModifierHelper.extractModifierFromClass(oldClassOptional, newClassOptional, new ModifierHelper.ExtractModifierFromClassCallback<AccessModifier>() {
 			@Override
-			public AccessModifier getModifierForOld(CtClass oldClass) {
+			public AccessModifier getModifierForOld(ClassApiSignature oldClass) {
 				return ModifierHelper.translateToModifierLevel(oldClass.getModifiers());
 			}
 
 			@Override
-			public AccessModifier getModifierForNew(CtClass newClass) {
+			public AccessModifier getModifierForNew(ClassApiSignature newClass) {
 				return ModifierHelper.translateToModifierLevel(newClass.getModifiers());
 			}
 		});
 	}
 
-	private JApiModifier<AbstractModifier> extractAbstractModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+	private JApiModifier<AbstractModifier> extractAbstractModifier(Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		return ModifierHelper.extractModifierFromClass(oldClassOptional, newClassOptional, new ModifierHelper.ExtractModifierFromClassCallback<AbstractModifier>() {
 			@Override
-			public AbstractModifier getModifierForOld(CtClass oldClass) {
+			public AbstractModifier getModifierForOld(ClassApiSignature oldClass) {
 				return Modifier.isAbstract(oldClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
 			}
 
 			@Override
-			public AbstractModifier getModifierForNew(CtClass newClass) {
+			public AbstractModifier getModifierForNew(ClassApiSignature newClass) {
 				return Modifier.isAbstract(newClass.getModifiers()) ? AbstractModifier.ABSTRACT : AbstractModifier.NON_ABSTRACT;
 			}
 		});
 	}
 
-	private JApiModifier<SyntheticModifier> extractSyntheticModifier(Optional<CtClass> oldClassOptional, Optional<CtClass> newClassOptional) {
+	private JApiModifier<SyntheticModifier> extractSyntheticModifier(Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		return ModifierHelper.extractModifierFromClass(oldClassOptional, newClassOptional, new ModifierHelper.ExtractModifierFromClassCallback<SyntheticModifier>() {
 			@Override
-			public SyntheticModifier getModifierForOld(CtClass oldClass) {
+			public SyntheticModifier getModifierForOld(ClassApiSignature oldClass) {
 				return ModifierHelper.isSynthetic(oldClass.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;
 			}
 
 			@Override
-			public SyntheticModifier getModifierForNew(CtClass newClass) {
+			public SyntheticModifier getModifierForNew(ClassApiSignature newClass) {
 				return ModifierHelper.isSynthetic(newClass.getModifiers()) ? SyntheticModifier.SYNTHETIC : SyntheticModifier.NON_SYNTHETIC;
 			}
 		});
@@ -660,12 +677,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	@XmlTransient
-	public Optional<CtClass> getNewClass() {
+	public Optional<ClassApiSignature> getNewClass() {
 		return newClass;
 	}
 
 	@XmlTransient
-	public Optional<CtClass> getOldClass() {
+	public Optional<ClassApiSignature> getOldClass() {
 		return oldClass;
 	}
 

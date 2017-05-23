@@ -17,7 +17,7 @@ import japicmp.output.xml.XmlOutputGenerator;
 import japicmp.output.xml.XmlOutputGeneratorOptions;
 import japicmp.versioning.SemanticVersion;
 import japicmp.versioning.VersionChange;
-import javassist.CtClass;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataRetrievalException;
@@ -477,7 +477,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					JApiReturnType returnType = jApiMethod.getReturnType();
 					String oldType = returnType.getOldReturnType();
 					try {
-						Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);
+						Optional<ClassApiSignature> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);
 						if (ctClassOptional.isPresent()) {
 							if (classExcluded(ctClassOptional.get())) {
 								return false;
@@ -488,7 +488,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					}
 					String newType = returnType.getNewReturnType();
 					try {
-						Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);
+						Optional<ClassApiSignature> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);
 						if (ctClassOptional.isPresent()) {
 							if (classExcluded(ctClassOptional.get())) {
 								return false;
@@ -539,8 +539,8 @@ public class JApiCmpMojo extends AbstractMojo {
 
 			private boolean breakBuildIfCausedByExclusion(JApiImplementedInterface jApiImplementedInterface) {
 				if (!breakBuildIfCausedByExclusion) {
-					CtClass ctClass = jApiImplementedInterface.getCtClass();
-					if (classExcluded(ctClass)) {
+					ClassApiSignature classApiSignature = jApiImplementedInterface.getCtClass();
+					if (classExcluded(classApiSignature)) {
 						return false;
 					}
 				}
@@ -572,7 +572,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					if (oldTypeOptional.isPresent()) {
 						String oldType = oldTypeOptional.get();
 						try {
-							Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);
+							Optional<ClassApiSignature> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.OLD, oldType);
 							if (ctClassOptional.isPresent()) {
 								if (classExcluded(ctClassOptional.get())) {
 									return false;
@@ -586,7 +586,7 @@ public class JApiCmpMojo extends AbstractMojo {
 					if (newTypeOptional.isPresent()) {
 						String newType = newTypeOptional.get();
 						try {
-							Optional<CtClass> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);
+							Optional<ClassApiSignature> ctClassOptional = jarArchiveComparator.loadClass(JarArchiveComparator.ArchiveType.NEW, newType);
 							if (ctClassOptional.isPresent()) {
 								if (classExcluded(ctClassOptional.get())) {
 									return false;
@@ -625,17 +625,17 @@ public class JApiCmpMojo extends AbstractMojo {
 
 			private boolean breakBuildIfCausedByExclusion(JApiSuperclass jApiSuperclass) {
 				if (!breakBuildIfCausedByExclusion) {
-					Optional<CtClass> oldSuperclassOptional = jApiSuperclass.getOldSuperclass();
+					Optional<ClassApiSignature> oldSuperclassOptional = jApiSuperclass.getOldSuperclass();
 					if (oldSuperclassOptional.isPresent()) {
-						CtClass ctClass = oldSuperclassOptional.get();
-						if (classExcluded(ctClass)) {
+						ClassApiSignature classApiSignature = oldSuperclassOptional.get();
+						if (classExcluded(classApiSignature)) {
 							return false;
 						}
 					}
-					Optional<CtClass> newSuperclassOptional = jApiSuperclass.getNewSuperclass();
+					Optional<ClassApiSignature> newSuperclassOptional = jApiSuperclass.getNewSuperclass();
 					if (newSuperclassOptional.isPresent()) {
-						CtClass ctClass = newSuperclassOptional.get();
-						if (classExcluded(ctClass)) {
+						ClassApiSignature classApiSignature = newSuperclassOptional.get();
+						if (classExcluded(classApiSignature)) {
 							return false;
 						}
 					}
@@ -643,12 +643,12 @@ public class JApiCmpMojo extends AbstractMojo {
 				return true;
 			}
 
-			private boolean classExcluded(CtClass ctClass) {
+			private boolean classExcluded(ClassApiSignature classApiSignature) {
 				List<japicmp.filter.Filter> excludes = options.getExcludes();
 				for (japicmp.filter.Filter exclude : excludes) {
 					if (exclude instanceof ClassFilter) {
 						ClassFilter classFilter = (ClassFilter) exclude;
-						if (classFilter.matches(ctClass)) {
+						if (classFilter.matches(classApiSignature)) {
 							return true;
 						}
 					}

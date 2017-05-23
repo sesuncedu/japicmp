@@ -7,8 +7,8 @@ import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -29,18 +29,18 @@ public class ShowSyntheticTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
-				return Collections.singletonList(ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = new CtClassBuilder().addToClassPool(classApiSignatureSource);
+				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().syntheticModifier().addToClass(ctClass);
-				CtFieldBuilder.create().syntheticModifier().addToClass(ctClass);
-				CtClass syntheticClass = new CtClassBuilder().syntheticModifier().name("japicmp.SyntheticClass").addToClassPool(classPool);
-				return Arrays.asList(ctClass, syntheticClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = new CtClassBuilder().addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().syntheticModifier().addToClass(classApiSignature);
+				CtFieldBuilder.create().syntheticModifier().addToClass(classApiSignature);
+				ClassApiSignature syntheticClass = new CtClassBuilder().syntheticModifier().name("japicmp.SyntheticClass").addToClassPool(classApiSignatureSource);
+				return Arrays.asList(classApiSignature, syntheticClass);
 			}
 		});
 		assertThat(jApiClasses.size(), is(2));
@@ -62,18 +62,18 @@ public class ShowSyntheticTest {
 		options.setIncludeSynthetic(false);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
-				return Collections.singletonList(ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = new CtClassBuilder().addToClassPool(classApiSignatureSource);
+				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = new CtClassBuilder().addToClassPool(classPool);
-				CtMethodBuilder.create().syntheticModifier().addToClass(ctClass);
-				CtFieldBuilder.create().syntheticModifier().addToClass(ctClass);
-				CtClass syntheticClass = new CtClassBuilder().syntheticModifier().name("japicmp.SyntheticClass").addToClassPool(classPool);
-				return Arrays.asList(ctClass, syntheticClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = new CtClassBuilder().addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().syntheticModifier().addToClass(classApiSignature);
+				CtFieldBuilder.create().syntheticModifier().addToClass(classApiSignature);
+				ClassApiSignature syntheticClass = new CtClassBuilder().syntheticModifier().name("japicmp.SyntheticClass").addToClassPool(classApiSignatureSource);
+				return Arrays.asList(classApiSignature, syntheticClass);
 			}
 		});
 		Options configOptions = Options.newDefault();

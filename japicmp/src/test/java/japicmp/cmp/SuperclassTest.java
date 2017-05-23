@@ -6,8 +6,8 @@ import japicmp.model.JApiClass;
 import japicmp.model.JApiCompatibilityChange;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtInterfaceBuilder;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -29,15 +29,15 @@ public class SuperclassTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = classPool.get("java.lang.Object");
-				return Collections.singletonList(ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = classApiSignatureSource.get("java.lang.Object");
+				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = classPool.get("java.lang.Object");
-				return Collections.singletonList(ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = classApiSignatureSource.get("java.lang.Object");
+				return Collections.singletonList(classApiSignature);
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "java.lang.Object");
@@ -50,16 +50,16 @@ public class SuperclassTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				return Collections.EMPTY_LIST;
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtClass ctClassSuper = CtClassBuilder.create().name("japicmp.Super").addToClassPool(classPool);
-				ctClass.setSuperclass(ctClassSuper);
-				return Arrays.asList(ctClass, ctClassSuper);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClassSuper = CtClassBuilder.create().name("japicmp.Super").addToClassPool(classApiSignatureSource);
+				classApiSignature.setSuperclass(ctClassSuper);
+				return Arrays.asList(classApiSignature, ctClassSuper);
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "japicmp.Test");
@@ -76,15 +76,15 @@ public class SuperclassTest {
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtClass ctClassSuper = CtClassBuilder.create().name("japicmp.Super").addToClassPool(classPool);
-				ctClass.setSuperclass(ctClassSuper);
-				return Arrays.asList(ctClass, ctClassSuper);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClassSuper = CtClassBuilder.create().name("japicmp.Super").addToClassPool(classApiSignatureSource);
+				classApiSignature.setSuperclass(ctClassSuper);
+				return Arrays.asList(classApiSignature, ctClassSuper);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				return Collections.EMPTY_LIST;
 			}
 		});
@@ -102,18 +102,18 @@ public class SuperclassTest {
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClassBase = CtInterfaceBuilder.create().name("Base").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassBase).addToClassPool(classPool);
-				return Arrays.asList(ctClassBase, ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClassBase = CtInterfaceBuilder.create().name("Base").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassBase).addToClassPool(classApiSignatureSource);
+				return Arrays.asList(ctClassBase, classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClassBase = CtClassBuilder.create().name("Base").addToClassPool(classPool);
-				CtClass ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassIntermediate).addToClassPool(classPool);
-				return Arrays.asList(ctClassBase, ctClassIntermediate, ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClassBase = CtClassBuilder.create().name("Base").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassIntermediate).addToClassPool(classApiSignatureSource);
+				return Arrays.asList(ctClassBase, ctClassIntermediate, classApiSignature);
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
@@ -131,19 +131,19 @@ public class SuperclassTest {
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClassBase = CtInterfaceBuilder.create().name("Base").addToClassPool(classPool);
-				CtClass ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassBase).addToClassPool(classPool);
-				return Arrays.asList(ctClassBase, ctClassIntermediate, ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClassBase = CtInterfaceBuilder.create().name("Base").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassBase).addToClassPool(classApiSignatureSource);
+				return Arrays.asList(ctClassBase, ctClassIntermediate, classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClassBase = CtClassBuilder.create().name("Base").addToClassPool(classPool);
-				CtClass ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassIntermediate).addToClassPool(classPool);
-				return Arrays.asList(ctClassBase, ctClassIntermediate, ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClassBase = CtClassBuilder.create().name("Base").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassIntermediate).addToClassPool(classApiSignatureSource);
+				return Arrays.asList(ctClassBase, ctClassIntermediate, classApiSignature);
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");
@@ -160,18 +160,18 @@ public class SuperclassTest {
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass ctClassBase = CtClassBuilder.create().name("Base").addToClassPool(classPool);
-				CtClass ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassIntermediate).addToClassPool(classPool);
-				return Arrays.asList(ctClassBase, ctClassIntermediate, ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClassBase = CtClassBuilder.create().name("Base").addToClassPool(classApiSignatureSource);
+				ClassApiSignature ctClassIntermediate = CtClassBuilder.create().name("Intermediate").withSuperclass(ctClassBase).addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassIntermediate).addToClassPool(classApiSignatureSource);
+				return Arrays.asList(ctClassBase, ctClassIntermediate, classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClassBase = CtInterfaceBuilder.create().name("Base").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("Test").withSuperclass(ctClassBase).addToClassPool(classPool);
-				return Arrays.asList(ctClassBase, ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature ctClassBase = CtInterfaceBuilder.create().name("Base").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassBase).addToClassPool(classApiSignatureSource);
+				return Arrays.asList(ctClassBase, classApiSignature);
 			}
 		});
 		JApiClass jApiClass = getJApiClass(jApiClasses, "Test");

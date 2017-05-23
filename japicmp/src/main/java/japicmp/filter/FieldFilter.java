@@ -1,8 +1,8 @@
 package japicmp.filter;
 
-import javassist.CtField;
+import com.criticollab.japicmp.classinfo.ApiField;
 
 public interface FieldFilter extends Filter {
 
-	boolean matches(CtField ctField);
+	boolean matches(ApiField apiField);
 }

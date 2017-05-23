@@ -1,8 +1,9 @@
 package japicmp.filter;
 
-import javassist.CtClass;
+
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 
 public interface ClassFilter extends Filter {
 
-	boolean matches(CtClass ctClass);
+	boolean matches(ClassApiSignature classApiSignature);
 }

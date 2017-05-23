@@ -4,25 +4,25 @@ import japicmp.cmp.ClassesComparator;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiClass;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 
 import java.util.List;
 
 public class ClassesHelper {
 
 	public interface ClassesGenerator {
-		List<CtClass> createOldClasses(ClassPool classPool) throws Exception;
+		List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception;
 
-		List<CtClass> createNewClasses(ClassPool classPool) throws Exception;
+		List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception;
 	}
 
 	public static List<JApiClass> compareClasses(JarArchiveComparatorOptions options, ClassesGenerator classesGenerator) throws Exception {
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
-		ClassPool classPool = jarArchiveComparator.getCommonClassPool();
+		ClassApiSignatureSource classApiSignatureSource = jarArchiveComparator.getCommonClassPool();
 		ClassesComparator classesComparator = new ClassesComparator(jarArchiveComparator, options);
-		List<CtClass> oldClasses = classesGenerator.createOldClasses(classPool);
-		List<CtClass> newClasses = classesGenerator.createNewClasses(classPool);
+		List<ClassApiSignature> oldClasses = classesGenerator.createOldClasses(classApiSignatureSource);
+		List<ClassApiSignature> newClasses = classesGenerator.createNewClasses(classApiSignatureSource);
 		classesComparator.compare(oldClasses, newClasses);
 		return classesComparator.getClasses();
 	}

@@ -1,6 +1,10 @@
 package japicmp.filter;
 
-import javassist.*;
+import com.criticollab.japicmp.classinfo.ApiBehavior;
+import com.criticollab.japicmp.classinfo.ApiConstructor;
+import com.criticollab.japicmp.classinfo.ApiField;
+import com.criticollab.japicmp.classinfo.ApiMethod;
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +24,12 @@ public class Filters {
 		return excludes;
 	}
 
-	public boolean includeClass(CtClass ctClass) {
-		String name = ctClass.getName();
+	public boolean includeClass(ClassApiSignature classApiSignature) {
+		String name = classApiSignature.getName();
 		for (Filter filter : excludes) {
 			if (filter instanceof ClassFilter) {
 				ClassFilter classFilter = (ClassFilter) filter;
-				if (classFilter.matches(ctClass)) {
+				if (classFilter.matches(classApiSignature)) {
 					if (LOGGER.isLoggable(Level.FINE)) {
 						LOGGER.log(Level.FINE, "Excluding class '" + name + "' because class filter '" + filter + "' matches.");
 					}
@@ -38,29 +42,29 @@ public class Filters {
 			includeCount++;
 			if (filter instanceof BehaviorFilter) {
 				BehaviorFilter behaviorFilter = (BehaviorFilter) filter;
-				CtMethod[] methods = ctClass.getDeclaredMethods();
-				for (CtMethod method : methods) {
+				ApiMethod[] methods = classApiSignature.getDeclaredMethods();
+				for (ApiMethod method : methods) {
 					if (behaviorFilter.matches(method)) {
 						return true;
 					}
 				}
-				CtConstructor[] constructors = ctClass.getDeclaredConstructors();
-				for (CtConstructor constructor : constructors) {
+				ApiConstructor[] constructors = classApiSignature.getDeclaredConstructors();
+				for (ApiConstructor constructor : constructors) {
 					if (behaviorFilter.matches(constructor)) {
 						return true;
 					}
 				}
 			} else if (filter instanceof FieldFilter) {
 				FieldFilter fieldFilter = (FieldFilter) filter;
-				CtField[] fields = ctClass.getDeclaredFields();
-				for (CtField field : fields) {
+				ApiField[] fields = classApiSignature.getDeclaredFields();
+				for (ApiField field : fields) {
 					if (fieldFilter.matches(field)) {
 						return true;
 					}
 				}
 			} else {
 				ClassFilter classFilter = (ClassFilter) filter;
-				if (classFilter.matches(ctClass)) {
+				if (classFilter.matches(classApiSignature)) {
 					if (LOGGER.isLoggable(Level.FINE)) {
 						LOGGER.log(Level.FINE, "Including class '" + name + "' because class filter '" + filter + "' matches.");
 					}
@@ -78,13 +82,13 @@ public class Filters {
 		return true;
 	}
 
-	public boolean includeBehavior(CtBehavior ctMethod) {
+	public boolean includeBehavior(ApiBehavior apiMethod) {
 		for (Filter filter : excludes) {
 			if (filter instanceof BehaviorFilter) {
 				BehaviorFilter behaviorFilter = (BehaviorFilter) filter;
-				if (behaviorFilter.matches(ctMethod)) {
+				if (behaviorFilter.matches(apiMethod)) {
 					if (LOGGER.isLoggable(Level.FINE)) {
-						LOGGER.log(Level.FINE, "Excluding method '" + ctMethod.getLongName() + "' because exclude method filter did match.");
+						LOGGER.log(Level.FINE, "Excluding method '" + apiMethod.getLongName() + "' because exclude method filter did match.");
 					}
 					return false;
 				}
@@ -95,9 +99,9 @@ public class Filters {
 			if (filter instanceof BehaviorFilter) {
 				includesCount++;
 				BehaviorFilter behaviorFilter = (BehaviorFilter) filter;
-				if (behaviorFilter.matches(ctMethod)) {
+				if (behaviorFilter.matches(apiMethod)) {
 					if (LOGGER.isLoggable(Level.FINE)) {
-						LOGGER.log(Level.FINE, "Including method '" + ctMethod.getLongName() + "' because include method filter matched.");
+						LOGGER.log(Level.FINE, "Including method '" + apiMethod.getLongName() + "' because include method filter matched.");
 					}
 					return true;
 				}
@@ -105,20 +109,20 @@ public class Filters {
 		}
 		if (includesCount > 0) {
 			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.log(Level.FINE, "Excluding method '" + ctMethod.getLongName() + "' because no include matched.");
+				LOGGER.log(Level.FINE, "Excluding method '" + apiMethod.getLongName() + "' because no include matched.");
 			}
 			return false;
 		}
 		return true;
 	}
 
-	public boolean includeField(CtField ctField) {
+	public boolean includeField(ApiField apiField) {
 		for (Filter filter : excludes) {
 			if (filter instanceof FieldFilter) {
 				FieldFilter fieldFilter = (FieldFilter) filter;
-				if (fieldFilter.matches(ctField)) {
+				if (fieldFilter.matches(apiField)) {
 					if (LOGGER.isLoggable(Level.FINE)) {
-						LOGGER.log(Level.FINE, "Excluding field '" + ctField.getName() + "' because exclude field filter did match.");
+						LOGGER.log(Level.FINE, "Excluding field '" + apiField.getName() + "' because exclude field filter did match.");
 					}
 					return false;
 				}
@@ -129,9 +133,9 @@ public class Filters {
 			if (filter instanceof FieldFilter) {
 				FieldFilter fieldFilter = (FieldFilter) filter;
 				includesCount++;
-				if (fieldFilter.matches(ctField)) {
+				if (fieldFilter.matches(apiField)) {
 					if (LOGGER.isLoggable(Level.FINE)) {
-						LOGGER.log(Level.FINE, "Including field '" + ctField.getName() + "' because include field filter matched.");
+						LOGGER.log(Level.FINE, "Including field '" + apiField.getName() + "' because include field filter matched.");
 					}
 					return true;
 				}
@@ -139,7 +143,7 @@ public class Filters {
 		}
 		if (includesCount > 0) {
 			if (LOGGER.isLoggable(Level.FINE)) {
-				LOGGER.log(Level.FINE, "Excluding field '" + ctField.getName() + "' because no include matched.");
+				LOGGER.log(Level.FINE, "Excluding field '" + apiField.getName() + "' because no include matched.");
 			}
 			return false;
 		}

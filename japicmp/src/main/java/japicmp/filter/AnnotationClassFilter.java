@@ -1,6 +1,6 @@
 package japicmp.filter;
 
-import javassist.CtClass;
+
 import javassist.NotFoundException;
 
 import java.util.List;
@@ -15,18 +15,18 @@ public class AnnotationClassFilter extends AnnotationFilterBase implements Class
 	}
 
 	@Override
-	public boolean matches(CtClass ctClass) {
-		List attributes = ctClass.getClassFile().getAttributes();
+	public boolean matches(ClassApiSignature classApiSignature) {
+		List attributes = classApiSignature.getClassFile().getAttributes();
 		boolean hasAnnotation = hasAnnotation(attributes);
 		if (!hasAnnotation) {
 			try {
-				CtClass declaringClass = ctClass.getDeclaringClass();
+				ClassApiSignature declaringClass = classApiSignature.getDeclaringClass();
 				if (declaringClass != null) {
 					attributes = declaringClass.getClassFile().getAttributes();
 					hasAnnotation = hasAnnotation(attributes);
 				}
 			} catch (NotFoundException e) {
-				LOGGER.log(Level.FINE, "Failed to load class '" + ctClass.getName() + "': " + e.getLocalizedMessage(), e);
+				LOGGER.log(Level.FINE, "Failed to load class '" + classApiSignature.getName() + "': " + e.getLocalizedMessage(), e);
 			}
 		}
 		return hasAnnotation;

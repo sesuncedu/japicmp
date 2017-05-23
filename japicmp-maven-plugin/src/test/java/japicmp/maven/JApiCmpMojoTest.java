@@ -9,8 +9,8 @@ import japicmp.maven.util.CtClassBuilder;
 import japicmp.maven.util.CtFieldBuilder;
 import japicmp.maven.util.CtInterfaceBuilder;
 import japicmp.maven.util.CtMethodBuilder;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
@@ -116,17 +116,17 @@ public class JApiCmpMojoTest {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass interfaceCtClass = CtInterfaceBuilder.create().name("japicmp.ITest").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").implementsInterface(interfaceCtClass).addToClassPool(classPool);
-				return Arrays.asList(interfaceCtClass, ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature interfaceCtClass = CtInterfaceBuilder.create().name("japicmp.ITest").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").implementsInterface(interfaceCtClass).addToClassPool(classApiSignatureSource);
+				return Arrays.asList(interfaceCtClass, classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass interfaceCtClass = CtInterfaceBuilder.create().name("japicmp.ITest").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				return Arrays.asList(interfaceCtClass, ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature interfaceCtClass = CtInterfaceBuilder.create().name("japicmp.ITest").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				return Arrays.asList(interfaceCtClass, classApiSignature);
 			}
 		});
 		options.addExcludeFromArgument(Optional.of("japicmp.ITest")); // exclude japicmp.ITest
@@ -153,19 +153,19 @@ public class JApiCmpMojoTest {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass fieldTypeCtClass = CtClassBuilder.create().name("japicmp.FieldType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtFieldBuilder.create().type(fieldTypeCtClass).name("field").addToClass(ctClass);
-				return Arrays.asList(fieldTypeCtClass, ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature fieldTypeCtClass = CtClassBuilder.create().name("japicmp.FieldType").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				CtFieldBuilder.create().type(fieldTypeCtClass).name("field").addToClass(classApiSignature);
+				return Arrays.asList(fieldTypeCtClass, classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass fieldTypeCtClass = CtClassBuilder.create().name("japicmp.FieldType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtFieldBuilder.create().type(classPool.get("java.lang.String")).name("field").addToClass(ctClass);
-				return Arrays.asList(fieldTypeCtClass, ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature fieldTypeCtClass = CtClassBuilder.create().name("japicmp.FieldType").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				CtFieldBuilder.create().type(classApiSignatureSource.get("java.lang.String")).name("field").addToClass(classApiSignature);
+				return Arrays.asList(fieldTypeCtClass, classApiSignature);
 			}
 		});
 		options.addExcludeFromArgument(Optional.of("japicmp.FieldType")); // exclude japicmp.FieldType
@@ -192,19 +192,19 @@ public class JApiCmpMojoTest {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.MethodReturnType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(typeCtClass).name("test").addToClass(ctClass);
-				return Arrays.asList(typeCtClass, ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature typeCtClass = CtClassBuilder.create().name("japicmp.MethodReturnType").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(typeCtClass).name("test").addToClass(classApiSignature);
+				return Arrays.asList(typeCtClass, classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.MethodReturnType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().returnType(classPool.get("java.lang.String")).name("test").addToClass(ctClass);
-				return Arrays.asList(typeCtClass, ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature typeCtClass = CtClassBuilder.create().name("japicmp.MethodReturnType").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().returnType(classApiSignatureSource.get("java.lang.String")).name("test").addToClass(classApiSignature);
+				return Arrays.asList(typeCtClass, classApiSignature);
 			}
 		});
 		options.addExcludeFromArgument(Optional.of("japicmp.MethodReturnType")); // exclude japicmp.MethodReturnType
@@ -231,17 +231,17 @@ public class JApiCmpMojoTest {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classPool);
-				return Arrays.asList(typeCtClass, ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classApiSignatureSource);
+				return Arrays.asList(typeCtClass, classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(classPool.get("java.lang.String")).addToClassPool(classPool);
-				return Arrays.asList(typeCtClass, ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").withSuperclass(classApiSignatureSource.get("java.lang.String")).addToClassPool(classApiSignatureSource);
+				return Arrays.asList(typeCtClass, classApiSignature);
 			}
 		});
 		options.addExcludeFromArgument(Optional.of("japicmp.SuperType")); // exclude japicmp.SuperType
@@ -259,18 +259,18 @@ public class JApiCmpMojoTest {
 		JarArchiveComparatorOptions jarArchiveComparatorOptions = JarArchiveComparatorOptions.of(options);
 		ClassesHelper.CompareClassesResult compareClassesResult = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classPool);
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classPool);
-				CtFieldBuilder.create().name("field").type(CtClass.intType).addToClass(ctClass);
-				CtMethodBuilder.create().publicAccess().returnType(CtClass.voidType).name("method").addToClass(ctClass);
-				return Arrays.asList(typeCtClass, ctClass);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature typeCtClass = CtClassBuilder.create().name("japicmp.SuperType").addToClassPool(classApiSignatureSource);
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").withSuperclass(typeCtClass).addToClassPool(classApiSignatureSource);
+				CtFieldBuilder.create().name("field").type(ClassApiSignature.intType).addToClass(classApiSignature);
+				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.voidType).name("method").addToClass(classApiSignature);
+				return Arrays.asList(typeCtClass, classApiSignature);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-				return Collections.singletonList(ctClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+				return Collections.singletonList(classApiSignature);
 			}
 		});
 		JApiCmpMojo mojo = new JApiCmpMojo();

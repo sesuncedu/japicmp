@@ -1,7 +1,7 @@
 package japicmp.filter;
 
-import javassist.CtClass;
-import javassist.CtField;
+
+import javassist.ApiField;
 import javassist.NotFoundException;
 
 import java.util.List;
@@ -16,11 +16,11 @@ public class AnnotationFieldFilter extends AnnotationFilterBase implements Field
 	}
 
 	@Override
-	public boolean matches(CtField ctField) {
-		List attributes = ctField.getFieldInfo().getAttributes();
+	public boolean matches(ApiField ApiField) {
+		List attributes = ApiField.getFieldInfo().getAttributes();
 		boolean hasAnnotation = hasAnnotation(attributes);
 		if (!hasAnnotation) {
-			CtClass declaringClass = ctField.getDeclaringClass();
+			ClassApiSignature declaringClass = ApiField.getDeclaringClass();
 			hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());
 			if (!hasAnnotation) {
 				try {

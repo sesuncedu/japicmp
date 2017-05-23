@@ -1,6 +1,6 @@
 package japicmp.filter;
 
-import javassist.CtClass;
+
 
 import java.util.regex.Pattern;
 
@@ -22,8 +22,8 @@ public class JavadocLikePackageFilter implements ClassFilter {
 	}
 
 	@Override
-	public boolean matches(CtClass ctClass) {
-		String name = ctClass.getPackageName();
+	public boolean matches(ClassApiSignature classApiSignature) {
+		String name = classApiSignature.getPackageName();
 		name = name == null ? "" : name;
 		return pattern.matcher(name).matches();
 	}

@@ -1,9 +1,9 @@
 package japicmp.maven.util;
 
+import com.criticollab.japicmp.classinfo.ApiField;
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 import japicmp.util.ModifierHelper;
 import javassist.CannotCompileException;
-import javassist.CtClass;
-import javassist.CtField;
 import javassist.Modifier;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
@@ -15,14 +15,14 @@ import java.util.List;
 
 public class CtFieldBuilder {
 	public static final String DEFAULT_FIELD_NAME = "field";
-	private CtClass type = CtClass.intType;
+	private ClassApiSignature type = ClassApiSignature.intType();
 	private String name = DEFAULT_FIELD_NAME;
 	private int modifier = Modifier.PUBLIC;
 	private List<String> annotations = new ArrayList<>();
 	private Object constantValue = null;
 
-	public CtFieldBuilder type(CtClass ctClass) {
-		this.type = ctClass;
+	public CtFieldBuilder type(ClassApiSignature classApiSignature) {
+		this.type = classApiSignature;
 		return this;
 	}
 
@@ -36,33 +36,33 @@ public class CtFieldBuilder {
 		return this;
 	}
 
-	public CtField addToClass(CtClass ctClass) throws CannotCompileException {
-		CtField ctField = new CtField(this.type, this.name, ctClass);
-		ctField.setModifiers(this.modifier);
+	public ApiField addToClass(ClassApiSignature classApiSignature) throws CannotCompileException {
+		ApiField ApiField = new ApiField(this.type, this.name, classApiSignature);
+		ApiField.setModifiers(this.modifier);
 		if (constantValue != null) {
 			if (constantValue instanceof Boolean) {
-				ctClass.addField(ctField, CtField.Initializer.constant((Boolean) constantValue));
+				classApiSignature.addField(ApiField, ApiField.Initializer.constant((Boolean) constantValue));
 			} else if (constantValue instanceof Integer) {
-				ctClass.addField(ctField, CtField.Initializer.constant((Integer) constantValue));
+				classApiSignature.addField(ApiField, ApiField.Initializer.constant((Integer) constantValue));
 			} else if (constantValue instanceof Long) {
-				ctClass.addField(ctField, CtField.Initializer.constant((Long) constantValue));
+				classApiSignature.addField(ApiField, ApiField.Initializer.constant((Long) constantValue));
 			} else if (constantValue instanceof String) {
-				ctClass.addField(ctField, CtField.Initializer.constant((String) constantValue));
+				classApiSignature.addField(ApiField, ApiField.Initializer.constant((String) constantValue));
 			} else {
 				throw new IllegalArgumentException("Provided constant value for field is of unsupported type: " + constantValue.getClass().getName());
 			}
 		} else {
-			ctClass.addField(ctField);
+			classApiSignature.addField(ApiField);
 		}
 		for (String annotation : annotations) {
-			ClassFile classFile = ctClass.getClassFile();
+			ClassFile classFile = classApiSignature.getClassFile();
 			ConstPool constPool = classFile.getConstPool();
 			AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
 			Annotation annot = new Annotation(annotation, constPool);
 			attr.setAnnotation(annot);
-			ctField.getFieldInfo().addAttribute(attr);
+			ApiField.getFieldInfo().addAttribute(attr);
 		}
-		return ctField;
+		return ApiField;
 	}
 
 	public static CtFieldBuilder create() {

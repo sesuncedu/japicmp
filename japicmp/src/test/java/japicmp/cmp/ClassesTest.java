@@ -7,8 +7,8 @@ import japicmp.model.JApiMethod;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtInterfaceBuilder;
 import japicmp.util.CtMethodBuilder;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -27,17 +27,17 @@ public class ClassesTest {
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
-				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classApiSignatureSource);
+				ClassApiSignature subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classApiSignatureSource);
 				return Arrays.asList(superClass, subClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
-				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(subClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classApiSignatureSource);
+				ClassApiSignature subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(ClassApiSignature.voidType).name("method").addToClass(subClass);
 				return Arrays.asList(superClass, subClass);
 			}
 		});
@@ -54,19 +54,19 @@ public class ClassesTest {
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(superClass);
-				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(ClassApiSignature.voidType).name("method").addToClass(superClass);
+				ClassApiSignature subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classApiSignatureSource);
 				return Arrays.asList(superClass, subClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(superClass);
-				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(subClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(ClassApiSignature.voidType).name("method").addToClass(superClass);
+				ClassApiSignature subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(ClassApiSignature.voidType).name("method").addToClass(subClass);
 				return Arrays.asList(superClass, subClass);
 			}
 		});
@@ -83,18 +83,18 @@ public class ClassesTest {
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
-				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classApiSignatureSource);
+				ClassApiSignature subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classApiSignatureSource);
 				return Arrays.asList(superClass, subClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(superClass);
-				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(subClass);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(ClassApiSignature.voidType).name("method").addToClass(superClass);
+				ClassApiSignature subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(ClassApiSignature.voidType).name("method").addToClass(subClass);
 				return Arrays.asList(superClass, subClass);
 			}
 		});
@@ -111,18 +111,18 @@ public class ClassesTest {
 		jarArchiveComparatorOptions.setAccessModifier(AccessModifier.PRIVATE);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(jarArchiveComparatorOptions, new ClassesHelper.ClassesGenerator() {
 			@Override
-			public List<CtClass> createOldClasses(ClassPool classPool) throws Exception {
-				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(superClass);
-				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").addToClassPool(classPool);
+			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(ClassApiSignature.voidType).name("method").addToClass(superClass);
+				ClassApiSignature subClass = CtClassBuilder.create().name("japicmp.Subclass").addToClassPool(classApiSignatureSource);
 				return Arrays.asList(superClass, subClass);
 			}
 
 			@Override
-			public List<CtClass> createNewClasses(ClassPool classPool) throws Exception {
-				CtClass superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classPool);
-				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(CtClass.voidType).name("method").addToClass(superClass);
-				CtClass subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classPool);
+			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
+				ClassApiSignature superClass = CtClassBuilder.create().name("japicmp.Superclass").addToClassPool(classApiSignatureSource);
+				CtMethodBuilder.create().publicAccess().abstractMethod().returnType(ClassApiSignature.voidType).name("method").addToClass(superClass);
+				ClassApiSignature subClass = CtClassBuilder.create().name("japicmp.Subclass").withSuperclass(superClass).addToClassPool(classApiSignatureSource);
 				return Arrays.asList(superClass, subClass);
 			}
 		});

@@ -2,33 +2,33 @@ package japicmp.maven.util;
 
 import com.google.common.base.Optional;
 import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
+
+
 
 public class CtInterfaceBuilder {
 	private String name = "japicmp.Test";
-	protected Optional<CtClass> superInterfaceOptional = Optional.absent();
+	protected Optional<ClassApiSignature> superInterfaceOptional = Optional.absent();
 
 	public CtInterfaceBuilder name(String name) {
 		this.name = name;
 		return this;
 	}
 
-	public CtClass addToClassPool(ClassPool classPool) throws CannotCompileException {
-		CtClass ctClass;
+	public ClassApiSignature addToClassPool(ClassApiSignatureSource classApiSignatureSource) throws CannotCompileException {
+		ClassApiSignature classApiSignature;
 		if (superInterfaceOptional.isPresent()) {
-			ctClass = classPool.makeInterface(this.name, superInterfaceOptional.get());
+			classApiSignature = classApiSignatureSource.makeInterface(this.name, superInterfaceOptional.get());
 		} else {
-			ctClass = classPool.makeInterface(this.name);
+			classApiSignature = classApiSignatureSource.makeInterface(this.name);
 		}
-		return ctClass;
+		return classApiSignature;
 	}
 
 	public static CtInterfaceBuilder create() {
 		return new CtInterfaceBuilder();
 	}
 
-	public CtInterfaceBuilder withSuperInterface(CtClass superInterface) {
+	public CtInterfaceBuilder withSuperInterface(ClassApiSignature superInterface) {
 		this.superInterfaceOptional = Optional.fromNullable(superInterface);
 		return this;
 	}

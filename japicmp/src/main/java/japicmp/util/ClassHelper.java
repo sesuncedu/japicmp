@@ -1,7 +1,8 @@
 package japicmp.util;
 
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 import japicmp.model.JApiClassType;
-import javassist.CtClass;
+
 
 public class ClassHelper {
 
@@ -9,12 +10,12 @@ public class ClassHelper {
 
 	}
 
-	public static JApiClassType.ClassType getType(CtClass ctClass) {
-		if (ctClass.isAnnotation()) {
+	public static JApiClassType.ClassType getType(ClassApiSignature classApiSignature) {
+		if (classApiSignature.isAnnotation()) {
 			return JApiClassType.ClassType.ANNOTATION;
-		} else if (ctClass.isEnum()) {
+		} else if (classApiSignature.isEnum()) {
 			return JApiClassType.ClassType.ENUM;
-		} else if (ctClass.isInterface()) {
+		} else if (classApiSignature.isInterface()) {
 			return JApiClassType.ClassType.INTERFACE;
 		} else {
 			return JApiClassType.ClassType.CLASS;

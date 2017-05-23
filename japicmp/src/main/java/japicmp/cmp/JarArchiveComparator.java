@@ -1,5 +1,7 @@
 package japicmp.cmp;
 
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.ClassApiSignatureSource;
 import com.google.common.base.Optional;
 import japicmp.compat.CompatibilityChanges;
 import japicmp.exception.JApiCmpException;
@@ -12,13 +14,15 @@ import japicmp.model.JApiClass;
 import japicmp.model.JavaObjectSerializationCompatibility;
 import japicmp.output.OutputFilter;
 import japicmp.util.AnnotationHelper;
-import javassist.ClassPool;
-import javassist.CtClass;
 import javassist.NotFoundException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -31,9 +35,9 @@ import static japicmp.util.FileHelper.toFileList;
  */
 public class JarArchiveComparator {
 	private static final Logger LOGGER = Logger.getLogger(JarArchiveComparator.class.getName());
-	private ClassPool commonClassPool;
-	private ClassPool oldClassPool;
-	private ClassPool newClassPool;
+	private ClassApiSignatureSource commonClassPool;
+	private ClassApiSignatureSource oldClassPool;
+	private ClassApiSignatureSource newClassPool;
 	private String commonClassPathAsString = "";
 	private String oldClassPathAsString = "";
 	private String newClassPathAsString = "";
@@ -80,37 +84,37 @@ public class JarArchiveComparator {
 
 	private void setupClasspaths() {
 		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
-			commonClassPool = new ClassPool();
+			commonClassPool = new ClassApiSignatureSource();
 			commonClassPathAsString = setupClasspath(commonClassPool, this.options.getClassPathEntries());
 		} else if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {
-			oldClassPool = new ClassPool();
+			oldClassPool = new ClassApiSignatureSource();
 			oldClassPathAsString = setupClasspath(oldClassPool, this.options.getOldClassPath());
-			newClassPool = new ClassPool();
+			newClassPool = new ClassApiSignatureSource();
 			newClassPathAsString = setupClasspath(newClassPool, this.options.getNewClassPath());
 		} else {
 			throw new JApiCmpException(Reason.IllegalState, "Unknown classpath mode: " + this.options.getClassPathMode());
 		}
 	}
 
-	private String setupClasspath(ClassPool classPool, List<String> classPathEntries) {
-		String classPathAsString = appendUserDefinedClassPathEntries(classPool, classPathEntries);
-		return appendSystemClassPath(classPool, classPathAsString);
+	private String setupClasspath(ClassApiSignatureSource classApiSignatureSource, List<String> classPathEntries) {
+		String classPathAsString = appendUserDefinedClassPathEntries(classApiSignatureSource, classPathEntries);
+		return appendSystemClassPath(classApiSignatureSource, classPathAsString);
 	}
 
-	private String appendSystemClassPath(ClassPool classPool, String classPathAsString) {
+	private String appendSystemClassPath(ClassApiSignatureSource classApiSignatureSource, String classPathAsString) {
 		String retVal = classPathAsString;
-		classPool.appendSystemPath();
+		classApiSignatureSource.appendSystemPath();
 		if (retVal.length() > 0 && !retVal.endsWith(File.pathSeparator)) {
 			retVal += File.pathSeparator;
 		}
 		return retVal;
 	}
 
-	private String appendUserDefinedClassPathEntries(ClassPool classPool, List<String> classPathEntries) {
+	private String appendUserDefinedClassPathEntries(ClassApiSignatureSource classApiSignatureSource, List<String> classPathEntries) {
 		String classPathAsString = "";
 		for (String classPathEntry : classPathEntries) {
 			try {
-				classPool.appendClassPath(classPathEntry);
+				classApiSignatureSource.appendClassPath(classPathEntry);
 				if (!classPathAsString.endsWith(File.pathSeparator)) {
 					classPathAsString += File.pathSeparator;
 				}
@@ -155,8 +159,8 @@ public class JarArchiveComparator {
 	}
 
 	private List<JApiClass> createAndCompareClassLists(List<File> oldArchives, List<File> newArchives) {
-		List<CtClass> oldClasses;
-		List<CtClass> newClasses;
+		List<ClassApiSignature> oldClasses;
+		List<ClassApiSignature> newClasses;
 		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
 			oldClasses = createListOfCtClasses(oldArchives, commonClassPool);
 			newClasses = createListOfCtClasses(newArchives, commonClassPool);
@@ -171,16 +175,16 @@ public class JarArchiveComparator {
 	}
 
 	/**
-	 * Compares the two lists with CtClass objects using the provided options instance.
+	 * Compares the two lists with ClassApiSignature objects using the provided options instance.
 	 *
 	 * @param options    the options to use
 	 * @param oldClasses a list of CtClasses that represent the old version
 	 * @param newClasses a list of CtClasses that represent the new version
 	 * @return a list of {@link japicmp.model.JApiClass} that represent the changes
 	 */
-	List<JApiClass> compareClassLists(JarArchiveComparatorOptions options, List<CtClass> oldClasses, List<CtClass> newClasses) {
-		List<CtClass> oldClassesFiltered = applyFilter(options, oldClasses);
-		List<CtClass> newClassesFiltered = applyFilter(options, newClasses);
+	List<JApiClass> compareClassLists(JarArchiveComparatorOptions options, List<ClassApiSignature> oldClasses, List<ClassApiSignature> newClasses) {
+		List<ClassApiSignature> oldClassesFiltered = applyFilter(options, oldClasses);
+		List<ClassApiSignature> newClassesFiltered = applyFilter(options, newClasses);
 		ClassesComparator classesComparator = new ClassesComparator(this, options);
 		classesComparator.compare(oldClassesFiltered, newClassesFiltered);
 		List<JApiClass> classList = classesComparator.getClasses();
@@ -195,18 +199,18 @@ public class JarArchiveComparator {
 		return classList;
 	}
 
-	private List<CtClass> applyFilter(JarArchiveComparatorOptions options, List<CtClass> ctClasses) {
-		List<CtClass> newList = new ArrayList<>(ctClasses.size());
-		for (CtClass ctClass : ctClasses) {
-			if (options.getFilters().includeClass(ctClass)) {
-				newList.add(ctClass);
+	private List<ClassApiSignature> applyFilter(JarArchiveComparatorOptions options, List<ClassApiSignature> ctClasses) {
+		List<ClassApiSignature> newList = new ArrayList<>(ctClasses.size());
+		for (ClassApiSignature classApiSignature : ctClasses) {
+			if (options.getFilters().includeClass(classApiSignature)) {
+				newList.add(classApiSignature);
 			}
 		}
 		return newList;
 	}
 
-	private List<CtClass> createListOfCtClasses(List<File> archives, ClassPool classPool) {
-		List<CtClass> classes = new LinkedList<>();
+	private List<ClassApiSignature> createListOfCtClasses(List<File> archives, ClassApiSignatureSource classApiSignatureSource) {
+		List<ClassApiSignature> classes = new LinkedList<>();
 		for (File archive : archives) {
 			if (LOGGER.isLoggable(Level.FINE)) {
 				LOGGER.fine("Loading classes from jar file '" + archive.getAbsolutePath() + "'");
@@ -217,18 +221,18 @@ public class JarArchiveComparator {
 					JarEntry jarEntry = entryEnumeration.nextElement();
 					String name = jarEntry.getName();
 					if (name.endsWith(".class")) {
-						CtClass ctClass;
+						ClassApiSignature classApiSignature;
 						try {
-							ctClass = classPool.makeClass(jarFile.getInputStream(jarEntry));
+							classApiSignature = classApiSignatureSource.makeClass(jarFile.getInputStream(jarEntry));
 						} catch (Exception e) {
 							throw new JApiCmpException(Reason.IoException, String.format("Failed to load file from jar '%s' as class file: %s.", name, e.getMessage()), e);
 						}
-						classes.add(ctClass);
+						classes.add(classApiSignature);
 						if (LOGGER.isLoggable(Level.FINE)) {
-							LOGGER.fine(String.format("Adding class '%s' with jar name '%s' to list.", ctClass.getName(), name));
+							LOGGER.fine(String.format("Adding class '%s' with jar name '%s' to list.", classApiSignature.getName(), name));
 						}
 						if (name.endsWith("package-info.class")) {
-							updatePackageFilter(ctClass);
+							updatePackageFilter(classApiSignature);
 						}
 					} else {
 						if (LOGGER.isLoggable(Level.FINE)) {
@@ -243,14 +247,14 @@ public class JarArchiveComparator {
 		return classes;
 	}
 
-	private void updatePackageFilter(CtClass ctClass) {
+	private void updatePackageFilter(ClassApiSignature classApiSignature) {
 		Filters filters = options.getFilters();
 		List<Filter> newFilters = new LinkedList<>();
 		for (Filter filter : filters.getIncludes()) {
 			if (filter instanceof AnnotationFilterBase) {
 				String className = ((AnnotationFilterBase) filter).getClassName();
-				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {
-					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName()));
+				if (AnnotationHelper.hasAnnotation(classApiSignature.getClassFile(), className)) {
+					newFilters.add(new JavadocLikePackageFilter(classApiSignature.getPackageName()));
 				}
 			}
 		}
@@ -261,8 +265,8 @@ public class JarArchiveComparator {
 		for (Filter filter : filters.getExcludes()) {
 			if (filter instanceof AnnotationFilterBase) {
 				String className = ((AnnotationFilterBase) filter).getClassName();
-				if (AnnotationHelper.hasAnnotation(ctClass.getClassFile(), className)) {
-					newFilters.add(new JavadocLikePackageFilter(ctClass.getPackageName()));
+				if (AnnotationHelper.hasAnnotation(classApiSignature.getClassFile(), className)) {
+					newFilters.add(new JavadocLikePackageFilter(classApiSignature.getPackageName()));
 				}
 			}
 		}
@@ -282,30 +286,30 @@ public class JarArchiveComparator {
 	}
 
 	/**
-	 * Returns the javassist ClassPool instance that is used by this instance. This can be used in unit tests to define
-	 * artificial CtClass instances for the same ClassPool.
+	 * Returns the javassist ClassApiSignatureSource instance that is used by this instance. This can be used in unit tests to define
+	 * artificial ClassApiSignature instances for the same ClassApiSignatureSource.
 	 *
-	 * @return an instance of ClassPool
+	 * @return an instance of ClassApiSignatureSource
 	 */
-	public ClassPool getCommonClassPool() {
+	public ClassApiSignatureSource getCommonClassPool() {
 		return commonClassPool;
 	}
 
 	/**
-	 * Returns the javassist ClassPool that is used for the old version.
+	 * Returns the javassist ClassApiSignatureSource that is used for the old version.
 	 *
-	 * @return an instance of ClassPool
+	 * @return an instance of ClassApiSignatureSource
      */
-	public ClassPool getOldClassPool() {
+	public ClassApiSignatureSource getOldClassPool() {
 		return oldClassPool;
 	}
 
 	/**
-	 * Returns the javassist ClassPool that is used for the new version.
+	 * Returns the javassist ClassApiSignatureSource that is used for the new version.
 	 *
-	 * @return an instance of ClassPool
+	 * @return an instance of ClassApiSignatureSource
 	 */
-	public ClassPool getNewClassPool() {
+	public ClassApiSignatureSource getNewClassPool() {
 		return newClassPool;
 	}
 
@@ -320,8 +324,8 @@ public class JarArchiveComparator {
 	 * @return the loaded class (if options are not set to ignore missing classes)
 	 * @throws japicmp.exception.JApiCmpException if loading the class fails
 	 */
-	public Optional<CtClass> loadClass(ArchiveType archiveType, String name) {
-		Optional<CtClass> loadedClass = Optional.absent();
+	public Optional<ClassApiSignature> loadClass(ArchiveType archiveType, String name) {
+		Optional<ClassApiSignature> loadedClass = Optional.absent();
 		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
 			try {
 				loadedClass = Optional.of(commonClassPool.get(name));

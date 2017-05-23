@@ -1,23 +1,23 @@
 package japicmp.util;
 
-import javassist.CtClass;
+
 import javassist.Modifier;
 
 public abstract class CtBehaviorBuilder {
 	protected int modifier = 0;
-	protected CtClass[] parameters = new CtClass[]{};
-	protected CtClass[] exceptions = new CtClass[]{};
+	protected ClassApiSignature[] parameters = new ClassApiSignature[]{};
+	protected ClassApiSignature[] exceptions = new ClassApiSignature[]{};
 
-	public CtBehaviorBuilder parameters(CtClass[] parameters) {
+	public CtBehaviorBuilder parameters(ClassApiSignature[] parameters) {
 		this.parameters = parameters;
 		return this;
 	}
 
-	public CtBehaviorBuilder parameter(CtClass parameter) {
+	public CtBehaviorBuilder parameter(ClassApiSignature parameter) {
 		if (this.parameters == null) {
-			this.parameters = new CtClass[]{parameter};
+			this.parameters = new ClassApiSignature[]{parameter};
 		} else {
-			CtClass[] newParameters = new CtClass[this.parameters.length + 1];
+			ClassApiSignature[] newParameters = new ClassApiSignature[this.parameters.length + 1];
 			System.arraycopy(this.parameters, 0, newParameters, 0, this.parameters.length);
 			newParameters[this.parameters.length] = parameter;
 			this.parameters = newParameters;
@@ -25,7 +25,7 @@ public abstract class CtBehaviorBuilder {
 		return this;
 	}
 
-	public CtBehaviorBuilder exceptions(CtClass[] exceptions) {
+	public CtBehaviorBuilder exceptions(ClassApiSignature[] exceptions) {
 		this.exceptions = exceptions;
 		return this;
 	}

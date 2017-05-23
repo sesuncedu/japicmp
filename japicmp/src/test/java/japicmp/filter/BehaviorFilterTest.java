@@ -15,94 +15,94 @@ public class BehaviorFilterTest {
 	@Test
 	public void testMethodTwoParamsIntLongSuccessful() throws CannotCompileException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#method(int,long)");
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
-		CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new CtClass[]{CtClass.intType, CtClass.longType}).addToClass(ctClass);
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassApiSignatureSource());
+		CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new ClassApiSignature[]{ClassApiSignature.intType, ClassApiSignature.longType}).addToClass(classApiSignature);
 		assertThat(filter.matches(ctBehavior), is(true));
 	}
 
 	@Test
 	public void testMethodOneParamsStringSuccessful() throws CannotCompileException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#method(japicmp.Param)");
-		ClassPool classPool = new ClassPool();
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-		CtClass paramCtClass = CtClassBuilder.create().name("japicmp.Param").addToClassPool(classPool);
-		CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new CtClass[]{paramCtClass}).addToClass(ctClass);
+		ClassApiSignatureSource classApiSignatureSource = new ClassApiSignatureSource();
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+		ClassApiSignature paramCtClass = CtClassBuilder.create().name("japicmp.Param").addToClassPool(classApiSignatureSource);
+		CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new ClassApiSignature[]{paramCtClass}).addToClass(classApiSignature);
 		assertThat(filter.matches(ctBehavior), is(true));
 	}
 
 	@Test
 	public void testMethodNoParamsSuccessful() throws CannotCompileException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#method()");
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
-		CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new CtClass[]{}).addToClass(ctClass);
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassApiSignatureSource());
+		CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new ClassApiSignature[]{}).addToClass(classApiSignature);
 		assertThat(filter.matches(ctBehavior), is(true));
 	}
 
 	@Test(expected = JApiCmpException.class)
 	public void testMethodMissingParenthesis() throws CannotCompileException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#method(");
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassPool());
-		CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new CtClass[]{}).addToClass(ctClass);
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(new ClassApiSignatureSource());
+		CtBehavior ctBehavior = CtMethodBuilder.create().name("method").parameters(new ClassApiSignature[]{}).addToClass(classApiSignature);
 		assertThat(filter.matches(ctBehavior), is(true));
 	}
 
 	@Test
 	public void testConstructorNoParamsSuccessful() throws CannotCompileException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#Test()");
-		ClassPool classPool = new ClassPool();
-		classPool.appendSystemPath();
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-		CtConstructor ctConstructor = CtConstructorBuilder.create().addToClass(ctClass);
+		ClassApiSignatureSource classApiSignatureSource = new ClassApiSignatureSource();
+		classApiSignatureSource.appendSystemPath();
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+		CtConstructor ctConstructor = CtConstructorBuilder.create().addToClass(classApiSignature);
 		assertThat(filter.matches(ctConstructor), is(true));
 	}
 
 	@Test
 	public void testConstructorOneParamLongSuccessful() throws CannotCompileException, NotFoundException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#Test(java.lang.Long)");
-		ClassPool classPool = new ClassPool();
-		classPool.appendSystemPath();
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-		CtConstructor ctConstructor = CtConstructorBuilder.create().parameter(classPool.get("java.lang.Long")).addToClass(ctClass);
+		ClassApiSignatureSource classApiSignatureSource = new ClassApiSignatureSource();
+		classApiSignatureSource.appendSystemPath();
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+		CtConstructor ctConstructor = CtConstructorBuilder.create().parameter(classApiSignatureSource.get("java.lang.Long")).addToClass(classApiSignature);
 		assertThat(filter.matches(ctConstructor), is(true));
 	}
 
 	@Test
 	public void testConstructorOneParamLongUnsuccessful() throws CannotCompileException, NotFoundException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#Test(java.lang.Long)");
-		ClassPool classPool = new ClassPool();
-		classPool.appendSystemPath();
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-		CtConstructor ctConstructor = CtConstructorBuilder.create().parameter(classPool.get("java.lang.Double")).addToClass(ctClass);
+		ClassApiSignatureSource classApiSignatureSource = new ClassApiSignatureSource();
+		classApiSignatureSource.appendSystemPath();
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+		CtConstructor ctConstructor = CtConstructorBuilder.create().parameter(classApiSignatureSource.get("java.lang.Double")).addToClass(classApiSignature);
 		assertThat(filter.matches(ctConstructor), is(false));
 	}
 
 	@Test
 	public void testConstructorNoParamLongUnsuccessful() throws CannotCompileException, NotFoundException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test#Test()");
-		ClassPool classPool = new ClassPool();
-		classPool.appendSystemPath();
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-		CtConstructor ctConstructor = CtConstructorBuilder.create().parameter(classPool.get("java.lang.Double")).addToClass(ctClass);
+		ClassApiSignatureSource classApiSignatureSource = new ClassApiSignatureSource();
+		classApiSignatureSource.appendSystemPath();
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+		CtConstructor ctConstructor = CtConstructorBuilder.create().parameter(classApiSignatureSource.get("java.lang.Double")).addToClass(classApiSignature);
 		assertThat(filter.matches(ctConstructor), is(false));
 	}
 
 	@Test
 	public void testCoberturaMethodWithWildcards() throws CannotCompileException, NotFoundException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.*#__cobertura*()");
-		ClassPool classPool = new ClassPool();
-		classPool.appendSystemPath();
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classPool);
-		CtMethod ctMethod = CtMethodBuilder.create().name("__cobertura_classmap").addToClass(ctClass);
+		ClassApiSignatureSource classApiSignatureSource = new ClassApiSignatureSource();
+		classApiSignatureSource.appendSystemPath();
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+		CtMethod ctMethod = CtMethodBuilder.create().name("__cobertura_classmap").addToClass(classApiSignature);
 		assertThat(filter.matches(ctMethod), is(true));
 	}
 
 	@Test
 	public void testMethodOfInnerClass() throws CannotCompileException, NotFoundException {
 		JavadocLikeBehaviorFilter filter = new JavadocLikeBehaviorFilter("japicmp.Test$InnerClass#method()");
-		ClassPool classPool = new ClassPool();
-		classPool.appendSystemPath();
-		CtClass ctClass = CtClassBuilder.create().name("japicmp.Test$InnerClass").addToClassPool(classPool);
-		CtMethod ctMethod = CtMethodBuilder.create().name("method").addToClass(ctClass);
+		ClassApiSignatureSource classApiSignatureSource = new ClassApiSignatureSource();
+		classApiSignatureSource.appendSystemPath();
+		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test$InnerClass").addToClassPool(classApiSignatureSource);
+		CtMethod ctMethod = CtMethodBuilder.create().name("method").addToClass(classApiSignature);
 		assertThat(filter.matches(ctMethod), is(true));
 	}
 }

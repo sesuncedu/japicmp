@@ -1,5 +1,6 @@
 package japicmp.test;
 
+import com.criticollab.japicmp.classinfo.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.cmp.JApiCmpArchive;
 import japicmp.cmp.JarArchiveComparator;
@@ -7,8 +8,13 @@ import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.SyntheticAttribute;
-import javassist.*;
+import javassist.CannotCompileException;
+
+import javassist.ApiField;
+import javassist.CtMethod;
+import javassist.CtNewMethod;
 import javassist.Modifier;
+import javassist.NotFoundException;
 import org.junit.Test;
 
 import java.io.File;
@@ -52,7 +58,7 @@ public class SyntheticAttributeTest {
 	}
 
 	private JApiCmpArchive instrumentClass(JApiCmpArchive archive) throws IOException, CannotCompileException, NotFoundException {
-		ClassPool classPool = ClassPool.getDefault();
+		ClassApiSignatureSource classApiSignatureSource = ClassApiSignatureSource.getDefault();
 		String path = Paths.get(System.getProperty("user.dir"), "target", "japicmp-test-v2-instrumented.jar").toString();
 		try (ZipFile zipFile = new ZipFile(archive.getFile()); ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(path))) {
 			Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -61,17 +67,17 @@ public class SyntheticAttributeTest {
 				String name = zipEntry.getName();
 				if (name.contains(Synthetic.class.getSimpleName() + ".class")) {
 					try (InputStream inputStream = zipFile.getInputStream(zipEntry)) {
-						CtClass ctClass = classPool.makeClass(inputStream);
-						CtMethod method = CtNewMethod.make("public int newMethod(int x) { return x; }", ctClass);
-						javassist.bytecode.SyntheticAttribute syntheticAttribute = new javassist.bytecode.SyntheticAttribute(ctClass.getClassFile().getConstPool());
+						ClassApiSignature classApiSignature = classApiSignatureSource.makeClass(inputStream);
+						CtMethod method = CtNewMethod.make("public int newMethod(int x) { return x; }", classApiSignature);
+						javassist.bytecode.SyntheticAttribute syntheticAttribute = new javassist.bytecode.SyntheticAttribute(classApiSignature.getClassFile().getConstPool());
 						method.setAttribute(syntheticAttribute.getName(), syntheticAttribute.get());
-						ctClass.setAttribute(syntheticAttribute.getName(), syntheticAttribute.get());
-						ctClass.addMethod(method);
-						CtField newField = new CtField(classPool.get(String.class.getCanonicalName()), "newField", ctClass);
+						classApiSignature.setAttribute(syntheticAttribute.getName(), syntheticAttribute.get());
+						classApiSignature.addMethod(method);
+						ApiField newField = new ApiField(classApiSignatureSource.get(String.class.getCanonicalName()), "newField", classApiSignature);
 						newField.setAttribute(syntheticAttribute.getName(), syntheticAttribute.get());
 						newField.setModifiers(Modifier.PUBLIC);
-						ctClass.addField(newField);
-						byte[] bytecode = ctClass.toBytecode();
+						classApiSignature.addField(newField);
+						byte[] bytecode = classApiSignature.toBytecode();
 						ZipEntry newEntry = new ZipEntry(zipEntry.getName());
 						zos.putNextEntry(newEntry);
 						zos.write(bytecode);

@@ -8,7 +8,7 @@ import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiJavaObjectSerializationCompatibility;
 import japicmp.test.serialversion.*;
-import javassist.CtClass;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -248,10 +248,10 @@ public class JavaObjectSerializationTest {
 		boolean successful = false;
 		try {
 			ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
-			Optional<CtClass> oldClassOptional = jApiClass.getOldClass();
+			Optional<ClassApiSignature> oldClassOptional = jApiClass.getOldClass();
 			if (oldClassOptional.isPresent()) {
-				CtClass ctClass = oldClassOptional.get();
-				Object oldClassInstance = ctClass.toClass(new URLClassLoader(new URL[]{}), JavaObjectSerializationTest.class.getProtectionDomain()).newInstance();
+				ClassApiSignature classApiSignature = oldClassOptional.get();
+				Object oldClassInstance = classApiSignature.toClass(new URLClassLoader(new URL[]{}), JavaObjectSerializationTest.class.getProtectionDomain()).newInstance();
 				ObjectOutputStream oos = new ObjectOutputStream(byteOutputStream);
 				oos.writeObject(oldClassInstance);
 				oos.flush();

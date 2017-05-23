@@ -4,7 +4,7 @@ import com.google.common.base.Splitter;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.SignatureParser;
 import javassist.CtBehavior;
-import javassist.CtClass;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +57,7 @@ public class JavadocLikeBehaviorFilter implements BehaviorFilter {
 		boolean classMatches = true;
 		boolean methodMatches = true;
 		boolean parameterMatches = true;
-		CtClass declaringClass = ctBehavior.getDeclaringClass();
+		ClassApiSignature declaringClass = ctBehavior.getDeclaringClass();
 		String name = declaringClass.getName();
 		if (!classPattern.matcher(name).matches()) {
 			classMatches = false;

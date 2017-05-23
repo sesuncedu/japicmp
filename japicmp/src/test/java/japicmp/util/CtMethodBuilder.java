@@ -1,7 +1,7 @@
 package japicmp.util;
 
 import javassist.CannotCompileException;
-import javassist.CtClass;
+
 import javassist.CtMethod;
 import javassist.CtNewMethod;
 import javassist.bytecode.AnnotationsAttribute;
@@ -16,7 +16,7 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 	public static final String DEFAULT_METHOD_NAME = "method";
 	protected String body = "return null;";
 	private String name = DEFAULT_METHOD_NAME;
-	private CtClass returnType;
+	private ClassApiSignature returnType;
 	private List<String> annotations = new ArrayList<>();
 
 	public CtMethodBuilder name(String name) {
@@ -29,8 +29,8 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return this;
 	}
 
-	public CtMethodBuilder returnType(CtClass ctClass) {
-		this.returnType = ctClass;
+	public CtMethodBuilder returnType(ClassApiSignature classApiSignature) {
+		this.returnType = classApiSignature;
 		return this;
 	}
 
@@ -39,15 +39,15 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return this;
 	}
 
-	public CtMethodBuilder parameters(CtClass[] parameters) {
+	public CtMethodBuilder parameters(ClassApiSignature[] parameters) {
 		return (CtMethodBuilder) super.parameters(parameters);
 	}
 
-	public CtMethodBuilder parameter(CtClass parameter) {
+	public CtMethodBuilder parameter(ClassApiSignature parameter) {
 		return (CtMethodBuilder) super.parameter(parameter);
 	}
 
-	public CtMethodBuilder exceptions(CtClass[] exceptions) {
+	public CtMethodBuilder exceptions(ClassApiSignature[] exceptions) {
 		return (CtMethodBuilder) super.exceptions(exceptions);
 	}
 
@@ -85,7 +85,7 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return this;
 	}
 
-	public CtMethod addToClass(CtClass declaringClass) throws CannotCompileException {
+	public CtMethod addToClass(ClassApiSignature declaringClass) throws CannotCompileException {
 		if (this.returnType == null) {
 			this.returnType = declaringClass;
 		}
