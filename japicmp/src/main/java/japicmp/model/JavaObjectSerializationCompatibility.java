@@ -1,18 +1,18 @@
 package japicmp.model;
 
-import com.criticollab.japicmp.classinfo.ApiField;
-import com.criticollab.japicmp.classinfo.ClassApiSignature;
-import com.criticollab.japicmp.classinfo.ClassApiSignatureSource;
+import com.criticollab.japicmp.classinfo.ApiExtractor;
+import com.criticollab.japicmp.classinfo.api.ApiField;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.exception.JApiCmpException;
-import javassist.NotFoundException;
-import javassist.SerialVersionUID;
 
 import java.io.Externalizable;
 import java.io.Serializable;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,33 +54,27 @@ public class JavaObjectSerializationCompatibility {
 				} catch (Exception e) {
 					LOGGER.log(Level.FINE, "Failed to get serialVersionUid from class " + classApiSignature.getName() + ": " + e.getLocalizedMessage(), e);
 					try {
-						SerialVersionUID.setSerialVersionUID(classApiSignature);
-						ApiField declaredField = classApiSignature.getDeclaredField(SERIAL_VERSION_UID);
-						Object constantValue = declaredField.getConstantValue();
-						if (constantValue instanceof Long) {
-							result.serialVersionUidDefault = Optional.of((Long) constantValue);
-						}
-						classApiSignature.removeField(declaredField);
+						result.serialVersionUid = Optional.of(ApiExtractor.getDefaultSerialUID(classApiSignature));
 					} catch (Exception ex) {
 						LOGGER.log(Level.FINE, "Failed to compute default serialVersionUid for class " + classApiSignature.getName() + ": " + ex.getLocalizedMessage(), ex);
 					}
 				}
-				if (!result.serialVersionUidDefault.isPresent()) {
-					try {
-						ApiField declaredFieldOriginal = classApiSignature.getDeclaredField(SERIAL_VERSION_UID);
-						classApiSignature.removeField(declaredFieldOriginal);
-						SerialVersionUID.setSerialVersionUID(classApiSignature);
-						ApiField declaredField = classApiSignature.getDeclaredField(SERIAL_VERSION_UID);
-						Object constantValue = declaredField.getConstantValue();
-						if (constantValue instanceof Long) {
-							result.serialVersionUidDefault = Optional.of((Long) constantValue);
-						}
-						classApiSignature.removeField(declaredField);
-						classApiSignature.addField(declaredFieldOriginal);
-					} catch (Exception ex) {
-						LOGGER.log(Level.FINE, "Failed to compute default serialVersionUid for class " + classApiSignature.getName() + ": " + ex.getLocalizedMessage(), ex);
-					}
-				}
+//				if (!result.serialVersionUidDefault.isPresent()) {
+//					try {
+//						ApiField declaredFieldOriginal = classApiSignature.getDeclaredField(SERIAL_VERSION_UID);
+//						classApiSignature.removeField(declaredFieldOriginal);
+//						SerialVersionUID.setSerialVersionUID(classApiSignature);
+//						ApiField declaredField = classApiSignature.getDeclaredField(SERIAL_VERSION_UID);
+//						Object constantValue = declaredField.getConstantValue();
+//						if (constantValue instanceof Long) {
+//							result.serialVersionUidDefault = Optional.of((Long) constantValue);
+//						}
+//						classApiSignature.removeField(declaredField);
+//						classApiSignature.addField(declaredFieldOriginal);
+//					} catch (Exception ex) {
+//						LOGGER.log(Level.FINE, "Failed to compute default serialVersionUid for class " + classApiSignature.getName() + ": " + ex.getLocalizedMessage(), ex);
+//					}
+//				}
 			}
 		}
 		return result;
@@ -90,7 +84,7 @@ public class JavaObjectSerializationCompatibility {
 		ClassApiSignatureSource pool = clazz.getClassPool();
 		try {
 			return clazz.subtypeOf(pool.get("java.io.Serializable"));
-		} catch (NotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			if (options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 				return false;
 			} else {

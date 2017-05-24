@@ -1,10 +1,10 @@
 package japicmp.filter;
 
-import com.criticollab.japicmp.classinfo.ApiBehavior;
-import com.criticollab.japicmp.classinfo.ApiConstructor;
-import com.criticollab.japicmp.classinfo.ApiField;
-import com.criticollab.japicmp.classinfo.ApiMethod;
-import com.criticollab.japicmp.classinfo.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ApiBehavior;
+import com.criticollab.japicmp.classinfo.api.ApiConstructor;
+import com.criticollab.japicmp.classinfo.api.ApiField;
+import com.criticollab.japicmp.classinfo.api.ApiMethod;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,10 +1,10 @@
 package japicmp.filter;
 
+import com.criticollab.japicmp.classinfo.api.ApiBehavior;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import com.google.common.base.Splitter;
 import japicmp.exception.JApiCmpException;
 import japicmp.util.SignatureParser;
-import javassist.CtBehavior;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,21 +53,21 @@ public class JavadocLikeBehaviorFilter implements BehaviorFilter {
 	}
 
 	@Override
-	public boolean matches(CtBehavior ctBehavior) {
+	public boolean matches(ApiBehavior apiBehavior) {
 		boolean classMatches = true;
 		boolean methodMatches = true;
 		boolean parameterMatches = true;
-		ClassApiSignature declaringClass = ctBehavior.getDeclaringClass();
+		ClassApiSignature declaringClass = apiBehavior.getDeclaringClass();
 		String name = declaringClass.getName();
 		if (!classPattern.matcher(name).matches()) {
 			classMatches = false;
 		}
-		String methodName = ctBehavior.getName();
+		String methodName = apiBehavior.getName();
 		if (!methodPattern.matcher(methodName).matches()) {
 			methodMatches = false;
 		}
 		SignatureParser signatureParser = new SignatureParser();
-		signatureParser.parse(ctBehavior.getSignature());
+		signatureParser.parse(apiBehavior.getSignature());
 		List<String> parameters = signatureParser.getParameters();
 		if (parameters.size() != parameterPatterns.size()) {
 			parameterMatches = false;

@@ -1,13 +1,9 @@
 package japicmp.util;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import com.google.common.base.Optional;
-
-
 import javassist.Modifier;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.ConstPool;
-import javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,25 +59,26 @@ public class CtClassBuilder {
 	}
 
 	public ClassApiSignature addToClassPool(ClassApiSignatureSource classApiSignatureSource) {
-		ClassApiSignature classApiSignature;
-		if (this.superclass.isPresent()) {
-			classApiSignature = classApiSignatureSource.makeClass(this.name, this.superclass.get());
-		} else {
-			classApiSignature = classApiSignatureSource.makeClass(this.name);
-		}
-		classApiSignature.setModifiers(this.modifier);
-		for (String annotation : annotations) {
-			ClassFile classFile = classApiSignature.getClassFile();
-			ConstPool constPool = classFile.getConstPool();
-			AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-			Annotation annot = new Annotation(annotation, constPool);
-			attr.setAnnotation(annot);
-			classApiSignature.getClassFile2().addAttribute(attr);
-		}
-		for (ClassApiSignature interfaceCtClass : interfaces) {
-			classApiSignature.addInterface(interfaceCtClass);
-		}
-		return classApiSignature;
+		throw new NoSuchMethodError("Not Implemented");
+//		ClassApiSignature classApiSignature;
+//		if (this.superclass.isPresent()) {
+//			classApiSignature = classApiSignatureSource.makeClass(this.name, this.superclass.get());
+//		} else {
+//			classApiSignature = classApiSignatureSource.makeClass(this.name);
+//		}
+//		classApiSignature.setModifiers(this.modifier);
+//		for (String annotation : annotations) {
+//			ClassFile classFile = classApiSignature.getClassFile();
+//			ConstPool constPool = classFile.getConstPool();
+//			AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
+//			Annotation annot = new Annotation(annotation, constPool);
+//			attr.setAnnotation(annot);
+//			classApiSignature.getClassFile2().addAttribute(attr);
+//		}
+//		for (ClassApiSignature interfaceCtClass : interfaces) {
+//			classApiSignature.addInterface(interfaceCtClass);
+//		}
+//		return classApiSignature;
 	}
 
 	public static CtClassBuilder create() {

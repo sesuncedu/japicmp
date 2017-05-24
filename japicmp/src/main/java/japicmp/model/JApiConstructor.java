@@ -1,29 +1,28 @@
 package japicmp.model;
 
+import com.criticollab.japicmp.classinfo.api.ApiConstructor;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
-import japicmp.cmp.JarArchiveComparatorOptions;
-import javassist.CtConstructor;
 
 import javax.xml.bind.annotation.XmlTransient;
 
 public class JApiConstructor extends JApiBehavior {
-	private final Optional<CtConstructor> oldConstructor;
-	private final Optional<CtConstructor> newConstructor;
+	private final Optional<ApiConstructor> oldConstructor;
+	private final Optional<ApiConstructor> newConstructor;
 
-	public JApiConstructor(JApiClass jApiClass, String name, JApiChangeStatus changeStatus, Optional<CtConstructor> oldConstructor, Optional<CtConstructor> newConstructor, JarArchiveComparator jarArchiveComparator) {
+	public JApiConstructor(JApiClass jApiClass, String name, JApiChangeStatus changeStatus, Optional<ApiConstructor> oldConstructor, Optional<ApiConstructor> newConstructor, JarArchiveComparator jarArchiveComparator) {
 		super(jApiClass, name, oldConstructor, newConstructor, changeStatus, jarArchiveComparator);
 		this.oldConstructor = oldConstructor;
 		this.newConstructor = newConstructor;
 	}
 
 	@XmlTransient
-	public Optional<CtConstructor> getNewConstructor() {
+	public Optional<ApiConstructor> getNewConstructor() {
 		return newConstructor;
 	}
 
 	@XmlTransient
-	public Optional<CtConstructor> getOldConstructor() {
+	public Optional<ApiConstructor> getOldConstructor() {
 		return oldConstructor;
 	}
 }

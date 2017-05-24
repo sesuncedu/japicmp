@@ -1,7 +1,8 @@
 package japicmp.cmp;
 
-import com.criticollab.japicmp.classinfo.ClassApiSignature;
-import com.criticollab.japicmp.classinfo.ClassApiSignatureSource;
+import com.criticollab.japicmp.classinfo.ApiExtractor;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import com.google.common.base.Optional;
 import japicmp.compat.CompatibilityChanges;
 import japicmp.exception.JApiCmpException;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -84,12 +86,12 @@ public class JarArchiveComparator {
 
 	private void setupClasspaths() {
 		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
-			commonClassPool = new ClassApiSignatureSource();
+			commonClassPool = ApiExtractor.newSignatureSource();
 			commonClassPathAsString = setupClasspath(commonClassPool, this.options.getClassPathEntries());
 		} else if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.TWO_SEPARATE_CLASSPATHS) {
-			oldClassPool = new ClassApiSignatureSource();
+			oldClassPool = ApiExtractor.newSignatureSource();
 			oldClassPathAsString = setupClasspath(oldClassPool, this.options.getOldClassPath());
-			newClassPool = new ClassApiSignatureSource();
+			newClassPool = ApiExtractor.newSignatureSource();;
 			newClassPathAsString = setupClasspath(newClassPool, this.options.getNewClassPath());
 		} else {
 			throw new JApiCmpException(Reason.IllegalState, "Unknown classpath mode: " + this.options.getClassPathMode());
@@ -119,7 +121,7 @@ public class JarArchiveComparator {
 					classPathAsString += File.pathSeparator;
 				}
 				classPathAsString += classPathEntry;
-			} catch (NotFoundException e) {
+			} catch (NoSuchElementException e) {
 				throw JApiCmpException.forClassLoading(e, classPathEntry, this);
 			}
 		}
@@ -329,7 +331,7 @@ public class JarArchiveComparator {
 		if (this.options.getClassPathMode() == JarArchiveComparatorOptions.ClassPathMode.ONE_COMMON_CLASSPATH) {
 			try {
 				loadedClass = Optional.of(commonClassPool.get(name));
-			} catch (NotFoundException e) {
+			} catch (ClassNotFoundException e) {
 				if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, name, this);
 				}
@@ -338,7 +340,7 @@ public class JarArchiveComparator {
 			if (archiveType == ArchiveType.OLD) {
 				try {
 					loadedClass = Optional.of(oldClassPool.get(name));
-				} catch (NotFoundException e) {
+				} catch (ClassNotFoundException e) {
 					if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 						throw JApiCmpException.forClassLoading(e, name, this);
 					}
@@ -346,7 +348,7 @@ public class JarArchiveComparator {
 			} else if (archiveType == ArchiveType.NEW) {
 				try {
 					loadedClass = Optional.of(newClassPool.get(name));
-				} catch (NotFoundException e) {
+				} catch (ClassNotFoundException e) {
 					if (!options.getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 						throw JApiCmpException.forClassLoading(e, name, this);
 					}

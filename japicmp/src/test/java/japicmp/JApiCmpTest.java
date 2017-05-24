@@ -1,12 +1,13 @@
 package japicmp;
 
+import com.criticollab.japicmp.classinfo.ApiExtractor;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
 import javassist.CannotCompileException;
-
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.contrib.java.lang.system.Assertion;
@@ -157,7 +158,7 @@ public class JApiCmpTest {
 				assertThat(errLogTrimmed, containsString("E: Could not load 'NotExistingSuperclass'".trim()));
 			}
 		});
-		ClassApiSignatureSource cp = new ClassApiSignatureSource(true);
+		ClassApiSignatureSource cp = ApiExtractor.newSignatureSource();
 		ClassApiSignature ctClassSuperclass = CtClassBuilder.create().name("NotExistingSuperclass").addToClassPool(cp);
 		CtConstructorBuilder.create().addToClass(ctClassSuperclass);
 		ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperclass).addToClassPool(cp);
@@ -177,7 +178,7 @@ public class JApiCmpTest {
 				assertThat(outLog, containsString("WARNING: You have ignored certain classes".trim()));
 			}
 		});
-		ClassApiSignatureSource cp = new ClassApiSignatureSource(true);
+		ClassApiSignatureSource cp = ApiExtractor.newSignatureSource();
 		ClassApiSignature ctClassSuperclass = CtClassBuilder.create().name("NotExistingSuperclass").addToClassPool(cp);
 		CtConstructorBuilder.create().addToClass(ctClassSuperclass);
 		ClassApiSignature classApiSignature = CtClassBuilder.create().name("Test").withSuperclass(ctClassSuperclass).addToClassPool(cp);

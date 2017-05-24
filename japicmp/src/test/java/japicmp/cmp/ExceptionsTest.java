@@ -1,12 +1,12 @@
 package japicmp.cmp;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiMethod;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtMethodBuilder;
-
-
 import org.junit.Test;
 
 import java.util.Collections;

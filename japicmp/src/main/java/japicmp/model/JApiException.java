@@ -1,6 +1,6 @@
 package japicmp.model;
 
-import com.criticollab.japicmp.classinfo.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 

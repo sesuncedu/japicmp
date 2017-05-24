@@ -1,9 +1,8 @@
 package japicmp.util;
 
+import com.criticollab.japicmp.classinfo.api.ApiConstructor;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import javassist.CannotCompileException;
-
-import javassist.CtConstructor;
-import javassist.CtNewConstructor;
 
 public class CtConstructorBuilder extends CtBehaviorBuilder {
 	protected String body = "System.out.println(\"a\");";
@@ -46,10 +45,11 @@ public class CtConstructorBuilder extends CtBehaviorBuilder {
 		return (CtConstructorBuilder) super.privateAccess();
 	}
 
-	public CtConstructor addToClass(ClassApiSignature declaringClass) throws CannotCompileException {
-		CtConstructor ctConstructor = CtNewConstructor.make(this.parameters, this.exceptions, this.body, declaringClass);
-		ctConstructor.setModifiers(this.modifier);
-		declaringClass.addConstructor(ctConstructor);
-		return ctConstructor;
+	public ApiConstructor addToClass(ClassApiSignature declaringClass) throws CannotCompileException {
+//		ApiConstructor ctConstructor = CtNewConstructor.make(this.parameters, this.exceptions, this.body, declaringClass);
+//		ctConstructor.setModifiers(this.modifier);
+//		declaringClass.addConstructor(ctConstructor);
+//		return ctConstructor;
+		throw new NoSuchMethodError("not implemented");
 	}
 }

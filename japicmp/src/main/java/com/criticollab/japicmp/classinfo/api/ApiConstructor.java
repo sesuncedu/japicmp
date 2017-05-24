@@ -1,4 +1,4 @@
-package com.criticollab.japicmp.classinfo;
+package com.criticollab.japicmp.classinfo.api;
 
 public interface ApiConstructor extends ApiBehavior{
 }

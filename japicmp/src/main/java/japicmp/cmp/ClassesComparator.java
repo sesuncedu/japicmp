@@ -1,12 +1,12 @@
 package japicmp.cmp;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiClassType;
 import japicmp.util.ClassHelper;
 import japicmp.util.ModifierHelper;
-
 
 import java.util.HashMap;
 import java.util.LinkedList;

@@ -1,11 +1,11 @@
 package japicmp.util;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.cmp.ClassesComparator;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiClass;
-
-
 
 import java.util.List;
 

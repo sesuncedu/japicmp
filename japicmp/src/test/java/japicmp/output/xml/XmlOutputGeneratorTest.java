@@ -1,5 +1,6 @@
 package japicmp.output.xml;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -8,7 +9,6 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiClassType;
-
 import org.junit.Test;
 
 import java.io.IOException;

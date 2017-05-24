@@ -1,8 +1,7 @@
 package japicmp.filter;
 
-import javassist.CtBehavior;
-
-import javassist.NotFoundException;
+import com.criticollab.japicmp.classinfo.api.ApiBehavior;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -16,11 +15,11 @@ public class AnnotationBehaviorFilter extends AnnotationFilterBase implements Be
 	}
 
 	@Override
-	public boolean matches(CtBehavior ctBehavior) {
-		List attributes = ctBehavior.getMethodInfo().getAttributes();
+	public boolean matches(ApiBehavior apiBehavior) {
+		List attributes = apiBehavior.getMethodInfo().getAttributes();
 		boolean hasAnnotation = hasAnnotation(attributes);
 		if (!hasAnnotation) {
-			ClassApiSignature declaringClass = ctBehavior.getDeclaringClass();
+			ClassApiSignature declaringClass = apiBehavior.getDeclaringClass();
 			hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());
 			if (!hasAnnotation) {
 				try {
@@ -28,7 +27,7 @@ public class AnnotationBehaviorFilter extends AnnotationFilterBase implements Be
 					if (declaringClass != null) {
 						hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());
 					}
-				} catch (NotFoundException e) {
+				} catch (ClassNotFoundException e) {
 					LOGGER.log(Level.FINE, "Failed to load class '" + declaringClass.getName() + "': " + e.getLocalizedMessage(), e);
 				}
 			}

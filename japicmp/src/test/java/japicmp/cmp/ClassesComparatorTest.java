@@ -1,12 +1,11 @@
 package japicmp.cmp;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
-import japicmp.util.CtMethodBuilder;
 import javassist.CannotCompileException;
-
-
 import javassist.NotFoundException;
 import org.junit.Test;
 
@@ -44,7 +43,8 @@ public class ClassesComparatorTest {
 
 	private ClassApiSignature createClassWithMethod(ClassApiSignatureSource classApiSignatureSource) throws NotFoundException, CannotCompileException {
 		ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-		CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
-		return classApiSignature;
+//		CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+//		return classApiSignature;
+		throw new NoSuchMethodError("Not Implemented yet");
 	}
 }

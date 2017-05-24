@@ -1,12 +1,12 @@
 package japicmp.filter;
 
+import com.criticollab.japicmp.classinfo.ApiExtractor;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
-import japicmp.util.CtFieldBuilder;
-
-
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -70,7 +70,7 @@ public class PackageFilterTest {
 
 	private ClassApiSignature createCtClassForPackage(String packageName) {
 		String className = packageName + (packageName.isEmpty() ? "" : ".") + "Test";
-		return CtClassBuilder.create().name(className).addToClassPool(new ClassApiSignatureSource());
+		return CtClassBuilder.create().name(className).addToClassPool(ApiExtractor.newSignatureSource());
 	}
 
 	@Test

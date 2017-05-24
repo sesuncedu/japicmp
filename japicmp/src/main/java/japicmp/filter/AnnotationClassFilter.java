@@ -1,9 +1,10 @@
 package japicmp.filter;
 
 
-import javassist.NotFoundException;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,7 +26,7 @@ public class AnnotationClassFilter extends AnnotationFilterBase implements Class
 					attributes = declaringClass.getClassFile().getAttributes();
 					hasAnnotation = hasAnnotation(attributes);
 				}
-			} catch (NotFoundException e) {
+			} catch (ClassNotFoundException e) {
 				LOGGER.log(Level.FINE, "Failed to load class '" + classApiSignature.getName() + "': " + e.getLocalizedMessage(), e);
 			}
 		}

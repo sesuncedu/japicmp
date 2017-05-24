@@ -1,11 +1,11 @@
 package japicmp.output.semver;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
-
-
 import org.junit.Test;
 
 import java.util.Collections;

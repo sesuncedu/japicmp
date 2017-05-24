@@ -1,13 +1,13 @@
 package japicmp.cmp;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.model.AccessModifier;
 import japicmp.model.JApiChangeStatus;
 import japicmp.model.JApiClass;
 import japicmp.model.JApiCompatibilityChange;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtInterfaceBuilder;
-
-
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -15,11 +15,9 @@ import java.util.Collections;
 import java.util.List;
 
 import static japicmp.util.Helper.getJApiClass;
-import static japicmp.util.Helper.getJApiImplementedInterface;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class SuperclassTest {
 
@@ -46,6 +44,7 @@ public class SuperclassTest {
 
 	@Test
 	public void testNewClass() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -58,7 +57,7 @@ public class SuperclassTest {
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
 				ClassApiSignature ctClassSuper = CtClassBuilder.create().name("japicmp.Super").addToClassPool(classApiSignatureSource);
-				classApiSignature.setSuperclass(ctClassSuper);
+//				classApiSignature.setSuperclass(ctClassSuper);
 				return Arrays.asList(classApiSignature, ctClassSuper);
 			}
 		});
@@ -72,6 +71,7 @@ public class SuperclassTest {
 
 	@Test
 	public void testRemovedClass() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -79,7 +79,7 @@ public class SuperclassTest {
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
 				ClassApiSignature ctClassSuper = CtClassBuilder.create().name("japicmp.Super").addToClassPool(classApiSignatureSource);
-				classApiSignature.setSuperclass(ctClassSuper);
+//				classApiSignature.setSuperclass(ctClassSuper);
 				return Arrays.asList(classApiSignature, ctClassSuper);
 			}
 

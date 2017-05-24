@@ -1,7 +1,7 @@
 package japicmp.maven.util;
 
-import com.criticollab.japicmp.classinfo.ApiField;
-import com.criticollab.japicmp.classinfo.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ApiField;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import japicmp.util.ModifierHelper;
 import javassist.CannotCompileException;
 import javassist.Modifier;

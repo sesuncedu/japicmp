@@ -1,8 +1,8 @@
 package japicmp.util;
 
-import com.criticollab.japicmp.classinfo.ApiBehavior;
-import com.criticollab.japicmp.classinfo.ApiField;
-import com.criticollab.japicmp.classinfo.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ApiBehavior;
+import com.criticollab.japicmp.classinfo.api.ApiField;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.config.Options;

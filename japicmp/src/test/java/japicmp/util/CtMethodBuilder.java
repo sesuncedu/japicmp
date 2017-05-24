@@ -1,13 +1,8 @@
 package japicmp.util;
 
+import com.criticollab.japicmp.classinfo.api.ApiMethod;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import javassist.CannotCompileException;
-
-import javassist.CtMethod;
-import javassist.CtNewMethod;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.ConstPool;
-import javassist.bytecode.annotation.Annotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,22 +80,23 @@ public class CtMethodBuilder extends CtBehaviorBuilder {
 		return this;
 	}
 
-	public CtMethod addToClass(ClassApiSignature declaringClass) throws CannotCompileException {
+	public ApiMethod addToClass(ClassApiSignature declaringClass) throws CannotCompileException {
 		if (this.returnType == null) {
 			this.returnType = declaringClass;
 		}
-		CtMethod ctMethod = CtNewMethod.make(this.modifier, this.returnType, this.name, this.parameters, this.exceptions, this.body, declaringClass);
-		ctMethod.setModifiers(this.modifier);
-		declaringClass.addMethod(ctMethod);
-		for (String annotation : annotations) {
-			ClassFile classFile = declaringClass.getClassFile();
-			ConstPool constPool = classFile.getConstPool();
-			AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
-			Annotation annot = new Annotation(annotation, constPool);
-			attr.setAnnotation(annot);
-			ctMethod.getMethodInfo().addAttribute(attr);
-		}
-		return ctMethod;
+//		ApiMethod ctMethod = CtNewMethod.make(this.modifier, this.returnType, this.name, this.parameters, this.exceptions, this.body, declaringClass);
+//		ctMethod.setModifiers(this.modifier);
+//		declaringClass.addMethod(ctMethod);
+//		for (String annotation : annotations) {
+//			ClassFile classFile = declaringClass.getClassFile();
+//			ConstPool constPool = classFile.getConstPool();
+//			AnnotationsAttribute attr = new AnnotationsAttribute(constPool, AnnotationsAttribute.visibleTag);
+//			Annotation annot = new Annotation(annotation, constPool);
+//			attr.setAnnotation(annot);
+//			ctMethod.getMethodInfo().addAttribute(attr);
+//		}
+//		return ctMethod;
+		throw new NoSuchMethodError("Not Implemented yet");
 	}
 
 	public static CtMethodBuilder create() {

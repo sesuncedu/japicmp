@@ -1,19 +1,19 @@
 package japicmp.model;
 
+import com.criticollab.japicmp.classinfo.api.ApiMethod;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.util.MethodDescriptorParser;
-import javassist.CtMethod;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 public class JApiMethod extends JApiBehavior {
-	private final Optional<CtMethod> oldMethod;
-	private final Optional<CtMethod> newMethod;
+	private final Optional<ApiMethod> oldMethod;
+	private final Optional<ApiMethod> newMethod;
 	private final JApiReturnType returnType;
 
-	public JApiMethod(JApiClass jApiClass, String name, JApiChangeStatus changeStatus, Optional<CtMethod> oldMethod, Optional<CtMethod> newMethod, JarArchiveComparator jarArchiveComparator) {
+	public JApiMethod(JApiClass jApiClass, String name, JApiChangeStatus changeStatus, Optional<ApiMethod> oldMethod, Optional<ApiMethod> newMethod, JarArchiveComparator jarArchiveComparator) {
 		super(jApiClass, name, oldMethod, newMethod, changeStatus, jarArchiveComparator);
 		this.oldMethod = oldMethod;
 		this.newMethod = newMethod;
@@ -30,7 +30,7 @@ public class JApiMethod extends JApiBehavior {
 		return changeStatus;
 	}
 
-	private JApiReturnType computeReturnTypeChanges(Optional<CtMethod> oldMethodOptional, Optional<CtMethod> newMethodOptional) {
+	private JApiReturnType computeReturnTypeChanges(Optional<ApiMethod> oldMethodOptional, Optional<ApiMethod> newMethodOptional) {
 		JApiReturnType jApiReturnType = new JApiReturnType(JApiChangeStatus.UNCHANGED, Optional.<String>absent(), Optional.<String>absent());
 		if (oldMethodOptional.isPresent() && newMethodOptional.isPresent()) {
 			String oldReturnType = computeReturnType(oldMethodOptional.get());
@@ -53,7 +53,7 @@ public class JApiMethod extends JApiBehavior {
 		return jApiReturnType;
 	}
 
-	private String computeReturnType(CtMethod oldMethod) {
+	private String computeReturnType(ApiMethod oldMethod) {
 		MethodDescriptorParser parser = new MethodDescriptorParser();
 		parser.parse(oldMethod.getSignature());
 		return parser.getReturnType();
@@ -113,12 +113,12 @@ public class JApiMethod extends JApiBehavior {
 	}
 
 	@XmlTransient
-	public Optional<CtMethod> getNewMethod() {
+	public Optional<ApiMethod> getNewMethod() {
 		return newMethod;
 	}
 
 	@XmlTransient
-	public Optional<CtMethod> getOldMethod() {
+	public Optional<ApiMethod> getOldMethod() {
 		return oldMethod;
 	}
 

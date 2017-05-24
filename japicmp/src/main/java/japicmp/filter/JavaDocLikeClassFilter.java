@@ -1,6 +1,7 @@
 package japicmp.filter;
 
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 
 import java.util.regex.Pattern;
 

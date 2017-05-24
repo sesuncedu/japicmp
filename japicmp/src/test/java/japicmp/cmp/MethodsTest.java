@@ -1,10 +1,13 @@
 package japicmp.cmp;
 
-import japicmp.model.*;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
+import japicmp.model.AccessModifier;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiMethod;
+import japicmp.model.JApiReturnType;
 import japicmp.util.CtClassBuilder;
-import japicmp.util.CtMethodBuilder;
-
-
 import org.junit.Test;
 
 import java.util.Collections;
@@ -14,27 +17,30 @@ import java.util.Objects;
 import static japicmp.util.Helper.getJApiClass;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class MethodsTest {
 
 	@Test
 	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeUnchanged() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
-				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
+				ClassApiSignature
+					classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -44,6 +50,7 @@ public class MethodsTest {
 
 	@Test
 	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeTwoNewMethods() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -56,8 +63,8 @@ public class MethodsTest {
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -70,21 +77,22 @@ public class MethodsTest {
 
 	@Test
 	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeOneNewMethod() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -109,21 +117,22 @@ public class MethodsTest {
 
 	@Test
 	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeOneRemovedMethod() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -148,14 +157,15 @@ public class MethodsTest {
 
 	@Test
 	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeTwoRemovedMethods() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
@@ -174,22 +184,23 @@ public class MethodsTest {
 
 	@Test
 	public void testClassWithTwoMethodsWithSameSignatureButDifferentReturnTypeOneModifiedMethod() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return true;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.doubleType).name("get").body("return true;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.doubleType).name("get").body("return true;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -214,6 +225,7 @@ public class MethodsTest {
 
 	@Test
 	public void testClassOneMethodAdded() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
@@ -226,7 +238,7 @@ public class MethodsTest {
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -241,13 +253,14 @@ public class MethodsTest {
 
 	@Test
 	public void testClassOneMethodRemoved() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
@@ -268,20 +281,21 @@ public class MethodsTest {
 
 	@Test
 	public void testClassOneMethodReturnTypeChanged() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.booleanType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -304,14 +318,14 @@ public class MethodsTest {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().privateAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().privateAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -329,20 +343,21 @@ public class MethodsTest {
 
 	@Test
 	public void testClassOneMethodUnchanged() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -358,21 +373,22 @@ public class MethodsTest {
 
 	@Test
 	public void testClassWithTwoMethodsOneAddedWithAdditionalParameter() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").addToClassPool(classApiSignatureSource);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
-				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").parameter(ClassApiSignature.intType).body("return true;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").body("return 42;").addToClass(classApiSignature);
+//				CtMethodBuilder.create().publicAccess().returnType(ClassApiSignature.intType).name("get").parameter(ClassApiSignature.intType).body("return true;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});

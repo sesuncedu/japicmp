@@ -1,5 +1,7 @@
 package japicmp.cmp;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.config.Options;
 import japicmp.model.JApiClass;
 import japicmp.output.OutputFilter;
@@ -7,8 +9,6 @@ import japicmp.output.stdout.StdoutOutputGenerator;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
 import japicmp.util.CtMethodBuilder;
-
-
 import org.junit.Test;
 
 import java.util.Arrays;

@@ -1,10 +1,11 @@
 package japicmp.filter;
 
 
-import javassist.ApiField;
-import javassist.NotFoundException;
+import com.criticollab.japicmp.classinfo.api.ApiField;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,11 +17,11 @@ public class AnnotationFieldFilter extends AnnotationFilterBase implements Field
 	}
 
 	@Override
-	public boolean matches(ApiField ApiField) {
-		List attributes = ApiField.getFieldInfo().getAttributes();
+	public boolean matches(ApiField apiField) {
+		List attributes = apiField.getFieldInfo().getAttributes();
 		boolean hasAnnotation = hasAnnotation(attributes);
 		if (!hasAnnotation) {
-			ClassApiSignature declaringClass = ApiField.getDeclaringClass();
+			ClassApiSignature declaringClass = apiField.getDeclaringClass();
 			hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());
 			if (!hasAnnotation) {
 				try {
@@ -28,7 +29,7 @@ public class AnnotationFieldFilter extends AnnotationFilterBase implements Field
 					if (declaringClass != null) {
 						hasAnnotation = hasAnnotation(declaringClass.getClassFile().getAttributes());
 					}
-				} catch (NotFoundException e) {
+				} catch (ClassNotFoundException e) {
 					LOGGER.log(Level.FINE, "Failed to load class '" + declaringClass.getName() + "': " + e.getLocalizedMessage(), e);
 				}
 			}

@@ -1,6 +1,7 @@
 package japicmp.util;
 
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import javassist.Modifier;
 
 public abstract class CtBehaviorBuilder {

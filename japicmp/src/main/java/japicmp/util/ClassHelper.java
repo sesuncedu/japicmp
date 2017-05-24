@@ -1,6 +1,6 @@
 package japicmp.util;
 
-import com.criticollab.japicmp.classinfo.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import japicmp.model.JApiClassType;
 
 

@@ -1,23 +1,28 @@
 package japicmp.model;
 
+import com.criticollab.japicmp.classinfo.api.ApiAnnotation;
 import com.google.common.base.Optional;
-import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.MemberValue;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlTransient;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	private final String fullyQualifiedName;
-	private final Optional<Annotation> oldAnnotation;
-	private final Optional<Annotation> newAnnotation;
+	private final Optional<ApiAnnotation> oldAnnotation;
+	private final Optional<ApiAnnotation> newAnnotation;
 	private final List<JApiAnnotationElement> elements = new LinkedList<>();
 	private JApiChangeStatus changeStatus;
 
-	public JApiAnnotation(String fullyQualifiedName, Optional<Annotation> oldAnnotation, Optional<Annotation> newAnnotation, JApiChangeStatus changeStatus) {
+	public JApiAnnotation(String fullyQualifiedName, Optional<ApiAnnotation> oldAnnotation, Optional<ApiAnnotation> newAnnotation, JApiChangeStatus changeStatus) {
 		this.fullyQualifiedName = fullyQualifiedName;
 		this.oldAnnotation = oldAnnotation;
 		this.newAnnotation = newAnnotation;
@@ -25,10 +30,10 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 		this.changeStatus = evaluateChangeStatus(changeStatus);
 	}
 
-	private void computeElements(List<JApiAnnotationElement> elements, Optional<Annotation> oldAnnotationOptional, Optional<Annotation> newAnnotationOptional) {
+	private void computeElements(List<JApiAnnotationElement> elements, Optional<ApiAnnotation> oldAnnotationOptional, Optional<ApiAnnotation> newAnnotationOptional) {
 		if (oldAnnotationOptional.isPresent() && newAnnotationOptional.isPresent()) {
-			Annotation oldAnnotation = oldAnnotationOptional.get();
-			Annotation newAnnotation = newAnnotationOptional.get();
+			ApiAnnotation oldAnnotation = oldAnnotationOptional.get();
+			ApiAnnotation newAnnotation = newAnnotationOptional.get();
 			Map<String, Optional<MemberValue>> oldMemberValueMap = buildMemberValueMap(oldAnnotation);
 			Map<String, Optional<MemberValue>> newMemberValueMap = buildMemberValueMap(newAnnotation);
 			for (String memberName : oldMemberValueMap.keySet()) {
@@ -53,7 +58,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 			}
 		} else {
 			if (oldAnnotationOptional.isPresent()) {
-				Annotation oldAnnotation = oldAnnotationOptional.get();
+				ApiAnnotation oldAnnotation = oldAnnotationOptional.get();
 				Map<String, Optional<MemberValue>> oldMemberValueMap = buildMemberValueMap(oldAnnotation);
 				for (String memberName : oldMemberValueMap.keySet()) {
 					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, oldMemberValueMap.get(memberName), Optional.<MemberValue>absent(),
@@ -62,7 +67,7 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 				}
 			}
 			if (newAnnotationOptional.isPresent()) {
-				Annotation newAnnotation = newAnnotationOptional.get();
+				ApiAnnotation newAnnotation = newAnnotationOptional.get();
 				Map<String, Optional<MemberValue>> newMemberValueMap = buildMemberValueMap(newAnnotation);
 				for (String memberName : newMemberValueMap.keySet()) {
 					JApiAnnotationElement jApiAnnotationElement = new JApiAnnotationElement(memberName, Optional.<MemberValue>absent(), newMemberValueMap.get(memberName),
@@ -73,13 +78,13 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 		}
 	}
 
-	private Map<String, Optional<MemberValue>> buildMemberValueMap(Annotation annotation) {
+	private Map<String, Optional<MemberValue>> buildMemberValueMap(ApiAnnotation apiAnnotation) {
 		Map<String, Optional<MemberValue>> map = new HashMap<>();
 		@SuppressWarnings("unchecked")
-		Set<String> memberNames = annotation.getMemberNames();
+		Set<String> memberNames = apiAnnotation.getMemberNames();
 		if (memberNames != null) {
 			for (String memberName : memberNames) {
-				MemberValue memberValue = annotation.getMemberValue(memberName);
+				MemberValue memberValue = apiAnnotation.getMemberValue(memberName);
 				if (memberValue == null) {
 					map.put(memberName, Optional.<MemberValue>absent());
 				} else {
@@ -113,12 +118,12 @@ public class JApiAnnotation implements JApiHasChangeStatus, JApiCompatibility {
 	}
 
 	@XmlTransient
-	public Optional<Annotation> getOldAnnotation() {
+	public Optional<ApiAnnotation> getOldAnnotation() {
 		return oldAnnotation;
 	}
 
 	@XmlTransient
-	public Optional<Annotation> getNewAnnotation() {
+	public Optional<ApiAnnotation> getNewAnnotation() {
 		return newAnnotation;
 	}
 

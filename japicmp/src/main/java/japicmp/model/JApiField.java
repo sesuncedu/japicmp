@@ -1,6 +1,7 @@
 package japicmp.model;
 
-import com.criticollab.japicmp.classinfo.ApiField;
+import com.criticollab.japicmp.classinfo.api.ApiAnnotationsAttribute;
+import com.criticollab.japicmp.classinfo.api.ApiField;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.util.AnnotationHelper;
@@ -53,8 +54,8 @@ public class JApiField implements JApiHasChangeStatus, JApiHasModifiers, JApiHas
 	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<ApiField> oldBehavior, Optional<ApiField> newBehavior, JarArchiveComparatorOptions options) {
 		AnnotationHelper.computeAnnotationChanges(annotations, oldBehavior, newBehavior, options, new AnnotationHelper.AnnotationsAttributeCallback<ApiField>() {
 			@Override
-			public AnnotationsAttribute getAnnotationsAttribute(ApiField field) {
-				return (AnnotationsAttribute) field.getFieldInfo().getAttribute(AnnotationsAttribute.visibleTag);
+			public ApiAnnotationsAttribute getAnnotationsAttribute(ApiField field) {
+				return (ApiAnnotationsAttribute) field.getFieldInfo().getAttribute(AnnotationsAttribute.visibleTag);
 			}
 		});
 	}

@@ -1,7 +1,7 @@
-package com.criticollab.japicmp.classinfo;
+package com.criticollab.japicmp.classinfo.api;
 
 public interface ApiField {
-	public String getName() ;
+	String getName() ;
 
 	ApiFieldInfo getFieldInfo();
 
@@ -12,4 +12,6 @@ public interface ApiField {
 	int getModifiers();
 
 	Object getConstantValue();
+
+	ClassApiSignature getDeclaringClass();
 }

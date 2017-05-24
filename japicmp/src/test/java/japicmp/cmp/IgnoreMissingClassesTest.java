@@ -1,32 +1,25 @@
 package japicmp.cmp;
 
+import com.criticollab.japicmp.classinfo.ApiExtractor;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.config.IgnoreMissingClasses;
 import japicmp.exception.JApiCmpException;
 import japicmp.model.JApiClass;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtConstructorBuilder;
-import javassist.CannotCompileException;
-
-
 import javassist.NotFoundException;
 import org.junit.Test;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
-import java.util.jar.JarOutputStream;
-import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 
 import static japicmp.util.Helper.toJApiCmpArchive;
 import static japicmp.util.JarUtil.createJarFile;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertThat;
@@ -36,12 +29,12 @@ public class IgnoreMissingClassesTest {
 
 	@Test
 	public void testNotFoundExceptionContainsClassName() {
-		ClassApiSignatureSource cp = new ClassApiSignatureSource(true);
+		ClassApiSignatureSource cp = ApiExtractor.newSignatureSource(true);
 		String className = "not.existing.class";
 		try {
 			cp.get(className);
 			fail("No exception thrown.");
-		} catch (NotFoundException e) {
+		} catch (ClassNotFoundException e) {
 			assertThat(e.getMessage(), containsString(className));
 		}
 	}
@@ -51,7 +44,8 @@ public class IgnoreMissingClassesTest {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		JarArchiveComparator jarArchiveComparator = new JarArchiveComparator(options);
 		ClassApiSignatureSource classApiSignatureSource = jarArchiveComparator.getCommonClassPool();
-		ClassApiSignature ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classApiSignatureSource);
+		ClassApiSignature
+			ctSuperclass = CtClassBuilder.create().name("SuperclassNotExisting").addToClassPool(classApiSignatureSource);
 		CtConstructorBuilder.create().publicAccess().addToClass(ctSuperclass);
 		ClassApiSignature classApiSignature = CtClassBuilder.create().withSuperclass(ctSuperclass).name("Test").addToClassPool(classApiSignatureSource);
 		Path oldPath = Paths.get(System.getProperty("user.dir"), "target", IgnoreMissingClasses.class.getSimpleName() + "_old.jar");

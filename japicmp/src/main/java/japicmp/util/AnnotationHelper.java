@@ -1,12 +1,12 @@
 package japicmp.util;
 
+import com.criticollab.japicmp.classinfo.api.ApiAnnotation;
+import com.criticollab.japicmp.classinfo.api.ApiAnnotationsAttribute;
+import com.criticollab.japicmp.classinfo.api.ApiClassFile;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparatorOptions;
 import japicmp.model.JApiAnnotation;
 import japicmp.model.JApiChangeStatus;
-import javassist.bytecode.AnnotationsAttribute;
-import javassist.bytecode.ClassFile;
-import javassist.bytecode.annotation.Annotation;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Map;
 public class AnnotationHelper {
 
 	public interface AnnotationsAttributeCallback<T> {
-		AnnotationsAttribute getAnnotationsAttribute(T t);
+		ApiAnnotationsAttribute getAnnotationsAttribute(T t);
 	}
 
 	public static <T> void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<T> oldClassOptional, Optional<T> newClassOptional,
@@ -24,10 +24,10 @@ public class AnnotationHelper {
 			if (oldClassOptional.isPresent() && newClassOptional.isPresent()) {
 				T oldClass = oldClassOptional.get();
 				T newClass = newClassOptional.get();
-				AnnotationsAttribute oldAnnotationsAttribute = annotationsAttributeCallback.getAnnotationsAttribute(oldClass);
-				AnnotationsAttribute newAnnotationsAttribute = annotationsAttributeCallback.getAnnotationsAttribute(newClass);
-				Map<String, Annotation> oldAnnotationMap;
-				Map<String, Annotation> newAnnotationMap;
+				ApiAnnotationsAttribute oldAnnotationsAttribute = annotationsAttributeCallback.getAnnotationsAttribute(oldClass);
+				ApiAnnotationsAttribute newAnnotationsAttribute = annotationsAttributeCallback.getAnnotationsAttribute(newClass);
+				Map<String, ApiAnnotation> oldAnnotationMap;
+				Map<String, ApiAnnotation> newAnnotationMap;
 				if (oldAnnotationsAttribute != null) {
 					oldAnnotationMap = buildAnnotationMap(oldAnnotationsAttribute.getAnnotations());
 				} else {
@@ -38,31 +38,31 @@ public class AnnotationHelper {
 				} else {
 					newAnnotationMap = new HashMap<>();
 				}
-				for (Annotation annotation : oldAnnotationMap.values()) {
-					Annotation foundAnnotation = newAnnotationMap.get(annotation.getTypeName());
+				for (ApiAnnotation apiAnnotation : oldAnnotationMap.values()) {
+					ApiAnnotation foundAnnotation = newAnnotationMap.get(apiAnnotation.getTypeName());
 					if (foundAnnotation != null) {
-						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.of(foundAnnotation), JApiChangeStatus.UNCHANGED);
+						JApiAnnotation jApiAnnotation = new JApiAnnotation(apiAnnotation.getTypeName(), Optional.of(apiAnnotation), Optional.of(foundAnnotation), JApiChangeStatus.UNCHANGED);
 						annotations.add(jApiAnnotation);
 					} else {
-						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.<Annotation>absent(), JApiChangeStatus.REMOVED);
+						JApiAnnotation jApiAnnotation = new JApiAnnotation(apiAnnotation.getTypeName(), Optional.of(apiAnnotation), Optional.<ApiAnnotation>absent(), JApiChangeStatus.REMOVED);
 						annotations.add(jApiAnnotation);
 					}
 				}
-				for (Annotation annotation : newAnnotationMap.values()) {
-					Annotation foundAnnotation = oldAnnotationMap.get(annotation.getTypeName());
+				for (ApiAnnotation apiAnnotation : newAnnotationMap.values()) {
+					ApiAnnotation foundAnnotation = oldAnnotationMap.get(apiAnnotation.getTypeName());
 					if (foundAnnotation == null) {
-						JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.<Annotation>absent(), Optional.of(annotation), JApiChangeStatus.NEW);
+						JApiAnnotation jApiAnnotation = new JApiAnnotation(apiAnnotation.getTypeName(), Optional.<ApiAnnotation>absent(), Optional.of(apiAnnotation), JApiChangeStatus.NEW);
 						annotations.add(jApiAnnotation);
 					}
 				}
 			} else {
 				if (oldClassOptional.isPresent()) {
 					T oldClass = oldClassOptional.get();
-					AnnotationsAttribute oldAnnotationsAttribute = annotationsAttributeCallback.getAnnotationsAttribute(oldClass);
+					ApiAnnotationsAttribute oldAnnotationsAttribute = annotationsAttributeCallback.getAnnotationsAttribute(oldClass);
 					if (oldAnnotationsAttribute != null) {
-						Map<String, Annotation> oldAnnotationMap = buildAnnotationMap(oldAnnotationsAttribute.getAnnotations());
-						for (Annotation annotation : oldAnnotationMap.values()) {
-							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.of(annotation), Optional.<Annotation>absent(),
+						Map<String, ApiAnnotation> oldAnnotationMap = buildAnnotationMap(oldAnnotationsAttribute.getAnnotations());
+						for (ApiAnnotation apiAnnotation : oldAnnotationMap.values()) {
+							JApiAnnotation jApiAnnotation = new JApiAnnotation(apiAnnotation.getTypeName(), Optional.of(apiAnnotation), Optional.<ApiAnnotation>absent(),
 								JApiChangeStatus.REMOVED);
 							annotations.add(jApiAnnotation);
 						}
@@ -70,11 +70,11 @@ public class AnnotationHelper {
 				}
 				if (newClassOptional.isPresent()) {
 					T newClass = newClassOptional.get();
-					AnnotationsAttribute newAnnotationsAttribute = annotationsAttributeCallback.getAnnotationsAttribute(newClass);
+					ApiAnnotationsAttribute newAnnotationsAttribute = annotationsAttributeCallback.getAnnotationsAttribute(newClass);
 					if (newAnnotationsAttribute != null) {
-						Map<String, Annotation> newAnnotationMap = buildAnnotationMap(newAnnotationsAttribute.getAnnotations());
-						for (Annotation annotation : newAnnotationMap.values()) {
-							JApiAnnotation jApiAnnotation = new JApiAnnotation(annotation.getTypeName(), Optional.<Annotation>absent(), Optional.of(annotation), JApiChangeStatus.NEW);
+						Map<String, ApiAnnotation> newAnnotationMap = buildAnnotationMap(newAnnotationsAttribute.getAnnotations());
+						for (ApiAnnotation apiAnnotation : newAnnotationMap.values()) {
+							JApiAnnotation jApiAnnotation = new JApiAnnotation(apiAnnotation.getTypeName(), Optional.<ApiAnnotation>absent(), Optional.of(apiAnnotation), JApiChangeStatus.NEW);
 							annotations.add(jApiAnnotation);
 						}
 					}
@@ -83,15 +83,15 @@ public class AnnotationHelper {
 		}
 	}
 
-	private static Map<String, Annotation> buildAnnotationMap(Annotation[] annotations) {
-		Map<String, Annotation> map = new HashMap<>();
-		for (Annotation annotation : annotations) {
-			map.put(annotation.getTypeName(), annotation);
+	private static Map<String, ApiAnnotation> buildAnnotationMap(ApiAnnotation[] annotations) {
+		Map<String, ApiAnnotation> map = new HashMap<>();
+		for (ApiAnnotation apiAnnotation : annotations) {
+			map.put(apiAnnotation.getTypeName(), apiAnnotation);
 		}
 		return map;
 	}
 
-	public static boolean hasAnnotation(ClassFile classFile, String annotationClassName) {
+	public static boolean hasAnnotation(ApiClassFile classFile, String annotationClassName) {
 		List attributes = classFile.getAttributes();
 		if (hasAnnotation(attributes, annotationClassName)) {
 			return true;
@@ -101,11 +101,11 @@ public class AnnotationHelper {
 
 	public static boolean hasAnnotation(List attributes, String annotationClassName) {
 		for (Object obj : attributes) {
-			if (obj instanceof AnnotationsAttribute) {
-				AnnotationsAttribute annotationsAttribute = (AnnotationsAttribute) obj;
-				Annotation[] annotations = annotationsAttribute.getAnnotations();
-				for (Annotation annotation : annotations) {
-					if (annotation.getTypeName().equals(annotationClassName)) {
+			if (obj instanceof ApiAnnotationsAttribute) {
+				ApiAnnotationsAttribute annotationsAttribute = (ApiAnnotationsAttribute) obj;
+				ApiAnnotation[] annotations = annotationsAttribute.getAnnotations();
+				for (ApiAnnotation apiAnnotation : annotations) {
+					if (apiAnnotation.getTypeName().equals(annotationClassName)) {
 						return true;
 					}
 				}

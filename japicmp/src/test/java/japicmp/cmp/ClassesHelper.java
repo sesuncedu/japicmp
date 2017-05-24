@@ -1,8 +1,8 @@
 package japicmp.cmp;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.model.JApiClass;
-
-
 
 import java.util.List;
 

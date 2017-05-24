@@ -1,25 +1,26 @@
 package japicmp.compat;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import japicmp.cmp.ClassesHelper;
 import japicmp.cmp.JarArchiveComparatorOptions;
-import japicmp.model.*;
+import japicmp.model.JApiChangeStatus;
+import japicmp.model.JApiClass;
+import japicmp.model.JApiClassType;
+import japicmp.model.JApiJavaObjectSerializationCompatibility;
 import japicmp.util.CtClassBuilder;
 import japicmp.util.CtFieldBuilder;
-import japicmp.util.CtMethodBuilder;
-
-
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.Serializable;
-import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static japicmp.util.Helper.getJApiClass;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class SerializationChangesTest {
 
@@ -110,6 +111,7 @@ public class SerializationChangesTest {
 		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_INCOMPATIBLE_FIELD_REMOVED));
 	}
 
+	@Ignore("builders not done")
 	@Test
 	 public void testClassCompatible() throws Exception {
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
@@ -118,16 +120,16 @@ public class SerializationChangesTest {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").implementsInterface(classApiSignatureSource.get(Serializable.class.getName())).addToClassPool(classApiSignatureSource);
-				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
-				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
+//				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").implementsInterface(classApiSignatureSource.get(Serializable.class.getName())).addToClassPool(classApiSignatureSource);
-				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
-				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
+//				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -141,26 +143,28 @@ public class SerializationChangesTest {
 		assertThat(jApiClass.getJavaObjectSerializationCompatible(), is(JApiJavaObjectSerializationCompatibility.JApiJavaObjectSerializationChangeStatus.SERIALIZABLE_COMPATIBLE));
 	}
 
+
 	@Test
 	public void testClassCompatibleWithSerialVersionUid() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").implementsInterface(classApiSignatureSource.get(Serializable.class.getName())).addToClassPool(classApiSignatureSource);
-				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
-				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(1L).addToClass(classApiSignature);
-				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(1L).addToClass(classApiSignature);
+//				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").implementsInterface(classApiSignatureSource.get(Serializable.class.getName())).addToClassPool(classApiSignatureSource);
-				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
-				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(1L).addToClass(classApiSignature);
-				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(1L).addToClass(classApiSignature);
+//				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -176,24 +180,25 @@ public class SerializationChangesTest {
 
 	@Test
 	public void testClassSerialVersionUidChanged() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").implementsInterface(classApiSignatureSource.get(Serializable.class.getName())).addToClassPool(classApiSignatureSource);
-				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
-				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(1L).addToClass(classApiSignature);
-				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(1L).addToClass(classApiSignature);
+//				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").implementsInterface(classApiSignatureSource.get(Serializable.class.getName())).addToClassPool(classApiSignatureSource);
-				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
-				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(2L).addToClass(classApiSignature);
-				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(2L).addToClass(classApiSignature);
+//				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});
@@ -209,23 +214,24 @@ public class SerializationChangesTest {
 
 	@Test
 	public void testClassSerialVersionUidRemovedAndNotMatchesNewDefault() throws Exception {
+		fail();
 		JarArchiveComparatorOptions options = new JarArchiveComparatorOptions();
 		options.setIncludeSynthetic(true);
 		List<JApiClass> jApiClasses = ClassesHelper.compareClasses(options, new ClassesHelper.ClassesGenerator() {
 			@Override
 			public List<ClassApiSignature> createOldClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").implementsInterface(classApiSignatureSource.get(Serializable.class.getName())).addToClassPool(classApiSignatureSource);
-				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
-				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(1L).addToClass(classApiSignature);
-				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.longType).staticAccess().finalAccess().name("serialVersionUID").withConstantValue(1L).addToClass(classApiSignature);
+//				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 
 			@Override
 			public List<ClassApiSignature> createNewClasses(ClassApiSignatureSource classApiSignatureSource) throws Exception {
 				ClassApiSignature classApiSignature = CtClassBuilder.create().name("japicmp.Test").implementsInterface(classApiSignatureSource.get(Serializable.class.getName())).addToClassPool(classApiSignatureSource);
-				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
-				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
+//				CtFieldBuilder.create().type(ClassApiSignature.intType).staticAccess().finalAccess().name("CONST").addToClass(classApiSignature);
+//				CtMethodBuilder.create().returnType(ClassApiSignature.intType).name("method").body("return 42;").addToClass(classApiSignature);
 				return Collections.singletonList(classApiSignature);
 			}
 		});

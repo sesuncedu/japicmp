@@ -1,7 +1,10 @@
 package japicmp.model;
 
-import com.criticollab.japicmp.classinfo.ApiField;
-import com.criticollab.japicmp.classinfo.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ApiAnnotationsAttribute;
+import com.criticollab.japicmp.classinfo.api.ApiConstructor;
+import com.criticollab.japicmp.classinfo.api.ApiField;
+import com.criticollab.japicmp.classinfo.api.ApiMethod;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -11,12 +14,8 @@ import japicmp.util.Constants;
 import japicmp.util.MethodDescriptorParser;
 import japicmp.util.ModifierHelper;
 import japicmp.util.SignatureParser;
-import javassist.CtConstructor;
-import javassist.ApiField;
-import javassist.CtMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
-import javassist.bytecode.AnnotationsAttribute;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -82,8 +81,8 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	private void computeAnnotationChanges(List<JApiAnnotation> annotations, Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
 		AnnotationHelper.computeAnnotationChanges(annotations, oldClassOptional, newClassOptional, options, new AnnotationHelper.AnnotationsAttributeCallback<ClassApiSignature>() {
 			@Override
-			public AnnotationsAttribute getAnnotationsAttribute(ClassApiSignature classApiSignature) {
-				return (AnnotationsAttribute) classApiSignature.getClassFile().getAttribute(AnnotationsAttribute.visibleTag);
+			public ApiAnnotationsAttribute getAnnotationsAttribute(ClassApiSignature classApiSignature) {
+				return (ApiAnnotationsAttribute) classApiSignature.getClassFile().getAttribute(ApiAnnotationsAttribute.visibleTag);
 			}
 		});
 	}
@@ -324,33 +323,33 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 	}
 
 	private void computeMethodChanges(JApiClass jApiClass, Optional<ClassApiSignature> oldClassOptional, Optional<ClassApiSignature> newClassOptional) {
-		Map<String, List<CtMethod>> oldMethodsMap = createMethodMap(oldClassOptional);
-		Map<String, List<CtMethod>> newMethodsMap = createMethodMap(newClassOptional);
+		Map<String, List<ApiMethod>> oldMethodsMap = createMethodMap(oldClassOptional);
+		Map<String, List<ApiMethod>> newMethodsMap = createMethodMap(newClassOptional);
 		sortMethodsIntoLists(jApiClass, oldMethodsMap, newMethodsMap);
-		Map<String, CtConstructor> oldConstructorsMap = createConstructorMap(oldClassOptional);
-		Map<String, CtConstructor> newConstructorsMap = createConstructorMap(newClassOptional);
+		Map<String, ApiConstructor> oldConstructorsMap = createConstructorMap(oldClassOptional);
+		Map<String, ApiConstructor> newConstructorsMap = createConstructorMap(newClassOptional);
 		sortConstructorsIntoLists(jApiClass, oldConstructorsMap, newConstructorsMap);
 	}
 
-	private void sortMethodsIntoLists(JApiClass jApiClass, Map<String, List<CtMethod>> oldMethodsMap, Map<String, List<CtMethod>> newMethodsMap) {
+	private void sortMethodsIntoLists(JApiClass jApiClass, Map<String, List<ApiMethod>> oldMethodsMap, Map<String, List<ApiMethod>> newMethodsMap) {
 		MethodDescriptorParser methodDescriptorParser = new MethodDescriptorParser();
 		for (String methodName : oldMethodsMap.keySet()) {
-			List<CtMethod> oldMethodsWithSameName = oldMethodsMap.get(methodName);
-			Iterator<CtMethod> oldMethodsWithSameNameIterator = oldMethodsWithSameName.iterator();
+			List<ApiMethod> oldMethodsWithSameName = oldMethodsMap.get(methodName);
+			Iterator<ApiMethod> oldMethodsWithSameNameIterator = oldMethodsWithSameName.iterator();
 			while (oldMethodsWithSameNameIterator.hasNext()) {
-				CtMethod oldMethod = oldMethodsWithSameNameIterator.next();
+				ApiMethod oldMethod = oldMethodsWithSameNameIterator.next();
 				methodDescriptorParser.parse(oldMethod.getSignature());
-				List<CtMethod> newMethodsWithSameName = newMethodsMap.get(methodName);
+				List<ApiMethod> newMethodsWithSameName = newMethodsMap.get(methodName);
 				if (newMethodsWithSameName == null) {
-					JApiMethod jApiMethod = new JApiMethod(jApiClass, oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<CtMethod>absent(), jarArchiveComparator);
+					JApiMethod jApiMethod = new JApiMethod(jApiClass, oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<ApiMethod>absent(), jarArchiveComparator);
 					addParametersToMethod(methodDescriptorParser, jApiMethod);
 					if (includeMethod(jApiMethod)) {
 						methods.add(jApiMethod);
 					}
 				} else {
-					Optional<CtMethod> matchingMethodOptional = findMatchingMethod(oldMethod, newMethodsWithSameName);
+					Optional<ApiMethod> matchingMethodOptional = findMatchingMethod(oldMethod, newMethodsWithSameName);
 					if (matchingMethodOptional.isPresent()) {
-						CtMethod matchingMethod = matchingMethodOptional.get();
+						ApiMethod matchingMethod = matchingMethodOptional.get();
 						JApiMethod jApiMethod = new JApiMethod(jApiClass, oldMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(oldMethod), Optional.of(matchingMethod), jarArchiveComparator);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
 						if (includeMethod(jApiMethod)) {
@@ -359,7 +358,7 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 						oldMethodsWithSameNameIterator.remove();
 						newMethodsWithSameName.remove(matchingMethod);
 					} else {
-						JApiMethod jApiMethod = new JApiMethod(jApiClass, oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<CtMethod>absent(), jarArchiveComparator);
+						JApiMethod jApiMethod = new JApiMethod(jApiClass, oldMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(oldMethod), Optional.<ApiMethod>absent(), jarArchiveComparator);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
 						if (includeMethod(jApiMethod)) {
 							methods.add(jApiMethod);
@@ -369,27 +368,27 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 			}
 		}
 		for (String methodName : newMethodsMap.keySet()) {
-			List<CtMethod> ctMethods = newMethodsMap.get(methodName);
-			for (CtMethod ctMethod : ctMethods) {
-				methodDescriptorParser.parse(ctMethod.getSignature());
-				List<CtMethod> methodsWithSameName = oldMethodsMap.get(ctMethod.getName());
+			List<ApiMethod> apiMethods = newMethodsMap.get(methodName);
+			for (ApiMethod apiMethod : apiMethods) {
+				methodDescriptorParser.parse(apiMethod.getSignature());
+				List<ApiMethod> methodsWithSameName = oldMethodsMap.get(apiMethod.getName());
 				if (methodsWithSameName == null) {
-					JApiMethod jApiMethod = new JApiMethod(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod), jarArchiveComparator);
+					JApiMethod jApiMethod = new JApiMethod(jApiClass, apiMethod.getName(), JApiChangeStatus.NEW, Optional.<ApiMethod>absent(), Optional.of(apiMethod), jarArchiveComparator);
 					addParametersToMethod(methodDescriptorParser, jApiMethod);
 					if (includeMethod(jApiMethod)) {
 						methods.add(jApiMethod);
 					}
 				} else {
-					Optional<CtMethod> matchingMethodOptional = findMatchingMethod(ctMethod, methodsWithSameName);
+					Optional<ApiMethod> matchingMethodOptional = findMatchingMethod(apiMethod, methodsWithSameName);
 					if (matchingMethodOptional.isPresent()) {
-						CtMethod matchingMethod = matchingMethodOptional.get();
-						JApiMethod jApiMethod = new JApiMethod(jApiClass, ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(matchingMethod), jarArchiveComparator);
+						ApiMethod matchingMethod = matchingMethodOptional.get();
+						JApiMethod jApiMethod = new JApiMethod(jApiClass, apiMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(apiMethod), Optional.of(matchingMethod), jarArchiveComparator);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
 						if (includeMethod(jApiMethod)) {
 							methods.add(jApiMethod);
 						}
 					} else {
-						JApiMethod jApiMethod = new JApiMethod(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtMethod>absent(), Optional.of(ctMethod), jarArchiveComparator);
+						JApiMethod jApiMethod = new JApiMethod(jApiClass, apiMethod.getName(), JApiChangeStatus.NEW, Optional.<ApiMethod>absent(), Optional.of(apiMethod), jarArchiveComparator);
 						addParametersToMethod(methodDescriptorParser, jApiMethod);
 						if (includeMethod(jApiMethod)) {
 							methods.add(jApiMethod);
@@ -400,12 +399,12 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 	}
 
-	private Optional<CtMethod> findMatchingMethod(CtMethod method, List<CtMethod> candidates) {
-		Optional<CtMethod> found = Optional.absent();
+	private Optional<ApiMethod> findMatchingMethod(ApiMethod method, List<ApiMethod> candidates) {
+		Optional<ApiMethod> found = Optional.absent();
 		SignatureParser methodSignatureParser = new SignatureParser();
 		methodSignatureParser.parse(method.getSignature());
-		List<CtMethod> methodsWithSameParameters = new ArrayList<>();
-		for (CtMethod candidate : candidates) {
+		List<ApiMethod> methodsWithSameParameters = new ArrayList<>();
+		for (ApiMethod candidate : candidates) {
 			boolean parameterListsEqual = true;
 			List<String> probeParameters = methodSignatureParser.getParameters();
 			SignatureParser candidateSignatureParser = new SignatureParser();
@@ -430,9 +429,9 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		if (methodsWithSameParameters.size() == 1) {
 			found = Optional.of(methodsWithSameParameters.get(0));
 		} else if (methodsWithSameParameters.size() > 1) {
-			CtMethod methodWithSameReturnType = null;
+			ApiMethod methodWithSameReturnType = null;
 			String probeReturnType = methodSignatureParser.getReturnType();
-			for (CtMethod candidate : methodsWithSameParameters) {
+			for (ApiMethod candidate : methodsWithSameParameters) {
 				SignatureParser candidateSignatureParser = new SignatureParser();
 				candidateSignatureParser.parse(candidate.getSignature());
 				String candidateReturnType = candidateSignatureParser.getReturnType();
@@ -453,32 +452,32 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		return ModifierHelper.matchesModifierLevel(jApiMethod, options.getAccessModifier());
 	}
 
-	private void sortConstructorsIntoLists(JApiClass jApiClass, Map<String, CtConstructor> oldConstructorsMap, Map<String, CtConstructor> newConstructorsMap) {
+	private void sortConstructorsIntoLists(JApiClass jApiClass, Map<String, ApiConstructor> oldConstructorsMap, Map<String, ApiConstructor> newConstructorsMap) {
 		MethodDescriptorParser methodDescriptorParser = new MethodDescriptorParser();
-		for (CtConstructor ctMethod : oldConstructorsMap.values()) {
-			String longName = ctMethod.getLongName();
-			methodDescriptorParser.parse(ctMethod.getSignature());
-			CtConstructor foundMethod = newConstructorsMap.get(longName);
+		for (ApiConstructor apiMethod : oldConstructorsMap.values()) {
+			String longName = apiMethod.getLongName();
+			methodDescriptorParser.parse(apiMethod.getSignature());
+			ApiConstructor foundMethod = newConstructorsMap.get(longName);
 			if (foundMethod == null) {
-				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(ctMethod), Optional.<CtConstructor>absent(), jarArchiveComparator);
+				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, apiMethod.getName(), JApiChangeStatus.REMOVED, Optional.of(apiMethod), Optional.<ApiConstructor>absent(), jarArchiveComparator);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
 				}
 			} else {
-				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(ctMethod), Optional.of(foundMethod), jarArchiveComparator);
+				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, apiMethod.getName(), JApiChangeStatus.UNCHANGED, Optional.of(apiMethod), Optional.of(foundMethod), jarArchiveComparator);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
 				}
 			}
 		}
-		for (CtConstructor ctMethod : newConstructorsMap.values()) {
-			String longName = ctMethod.getLongName();
-			methodDescriptorParser.parse(ctMethod.getSignature());
-			CtConstructor foundMethod = oldConstructorsMap.get(longName);
+		for (ApiConstructor apiMethod : newConstructorsMap.values()) {
+			String longName = apiMethod.getLongName();
+			methodDescriptorParser.parse(apiMethod.getSignature());
+			ApiConstructor foundMethod = oldConstructorsMap.get(longName);
 			if (foundMethod == null) {
-				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, ctMethod.getName(), JApiChangeStatus.NEW, Optional.<CtConstructor>absent(), Optional.of(ctMethod), jarArchiveComparator);
+				JApiConstructor jApiConstructor = new JApiConstructor(jApiClass, apiMethod.getName(), JApiChangeStatus.NEW, Optional.<ApiConstructor>absent(), Optional.of(apiMethod), jarArchiveComparator);
 				addParametersToMethod(methodDescriptorParser, jApiConstructor);
 				if (includeConstructor(jApiConstructor)) {
 					constructors.add(jApiConstructor);
@@ -497,31 +496,32 @@ public class JApiClass implements JApiHasModifiers, JApiHasChangeStatus, JApiHas
 		}
 	}
 
-	private Map<String, List<CtMethod>> createMethodMap(Optional<ClassApiSignature> ctClassOptional) {
-		Map<String, List<CtMethod>> methods = new HashMap<>();
+	private Map<String, List<ApiMethod>> createMethodMap(Optional<ClassApiSignature> ctClassOptional) {
+		Map<String, List<ApiMethod>> methods = new HashMap<>();
 		if (ctClassOptional.isPresent()) {
 			ClassApiSignature classApiSignature = ctClassOptional.get();
-			for (CtMethod ctMethod : classApiSignature.getDeclaredMethods()) {
-				if (options.getFilters().includeBehavior(ctMethod)) {
-					String name = ctMethod.getName();
-					List<CtMethod> ctMethods = methods.get(name);
-					if (ctMethods == null) {
-						ctMethods = new ArrayList<>();
-						methods.put(name, ctMethods);
+			for (ApiMethod apiMethod : classApiSignature.getDeclaredMethods()) {
+				if (options.getFilters().includeBehavior(apiMethod)) {
+					String name;
+					name = apiMethod.getName();
+					List<ApiMethod> apiMethods = methods.get(name);
+					if (apiMethods == null) {
+						apiMethods = new ArrayList<>();
+						methods.put(name, apiMethods);
 					}
-					ctMethods.add(ctMethod);
+					apiMethods.add(apiMethod);
 				}
 			}
 		}
 		return methods;
 	}
 
-	private Map<String, CtConstructor> createConstructorMap(Optional<ClassApiSignature> classApiSignature) {
-		Map<String, CtConstructor> methods = new HashMap<>();
+	private Map<String, ApiConstructor> createConstructorMap(Optional<ClassApiSignature> classApiSignature) {
+		Map<String, ApiConstructor> methods = new HashMap<>();
 		if (classApiSignature.isPresent()) {
-			for (CtConstructor ctConstructor : classApiSignature.get().getDeclaredConstructors()) {
-				if (options.getFilters().includeBehavior(ctConstructor)) {
-					methods.put(ctConstructor.getLongName(), ctConstructor);
+			for (ApiConstructor apiConstructor : classApiSignature.get().getDeclaredConstructors()) {
+				if (options.getFilters().includeBehavior(apiConstructor)) {
+					methods.put(apiConstructor.getLongName(), apiConstructor);
 				}
 			}
 		}

@@ -1,5 +1,7 @@
 package japicmp.compat;
 
+import com.criticollab.japicmp.classinfo.api.ClassApiSignature;
+import com.criticollab.japicmp.classinfo.api.ClassApiSignatureSource;
 import com.google.common.base.Optional;
 import japicmp.cmp.JarArchiveComparator;
 import japicmp.cmp.JarArchiveComparatorOptions;
@@ -7,15 +9,13 @@ import japicmp.exception.JApiCmpException;
 import japicmp.model.*;
 import japicmp.util.ClassHelper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javassist.NotFoundException;
-
-import java.util.*;
-import java.util.logging.Logger;
-
-import static japicmp.util.ModifierHelper.hasModifierLevelDecreased;
-import static japicmp.util.ModifierHelper.isNotPrivate;
-import static japicmp.util.ModifierHelper.isSynthetic;
+import static japicmp.util.ModifierHelper.*;
 
 public class CompatibilityChanges {
 	private final JarArchiveComparator jarArchiveComparator;
@@ -198,14 +198,14 @@ public class CompatibilityChanges {
 			ClassApiSignatureSource classApiSignatureSource = this.jarArchiveComparator.getCommonClassPool();
 			try {
 				oldClassOptional = Optional.of(classApiSignatureSource.get(newSuperclassName));
-			} catch (NotFoundException e) {
+			} catch (ClassNotFoundException e) {
 				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
 			}
 			try {
 				newClassOptional = Optional.of(classApiSignatureSource.get(newSuperclassName));
-			} catch (NotFoundException e) {
+			} catch (ClassNotFoundException e) {
 				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
@@ -215,14 +215,14 @@ public class CompatibilityChanges {
 			ClassApiSignatureSource newClassPool = this.jarArchiveComparator.getNewClassPool();
 			try {
 				oldClassOptional = Optional.of(oldClassPool.get(newSuperclassName));
-			} catch (NotFoundException e) {
+			} catch (ClassNotFoundException e) {
 				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
 			}
 			try {
 				newClassOptional = Optional.of(newClassPool.get(newSuperclassName));
-			} catch (NotFoundException e) {
+			} catch (ClassNotFoundException e) {
 				if (!this.jarArchiveComparator.getJarArchiveComparatorOptions().getIgnoreMissingClasses().ignoreClass(e.getMessage())) {
 					throw JApiCmpException.forClassLoading(e, newSuperclassName, this.jarArchiveComparator);
 				}
